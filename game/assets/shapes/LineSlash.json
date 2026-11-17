@@ -1,0 +1,9 @@
+{
+  "name": "LineSlash",
+  "width": 120,
+  "height": 18,
+  "layers": [
+    { "type": "capsule", "modes": "V", "fill": "hull",
+      "x1": 60, "y1": 9, "x2": 116, "y2": 9, "r": 8 }
+  ]
+}

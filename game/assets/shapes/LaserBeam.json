@@ -1,0 +1,8 @@
+{
+  "name": "LaserBeam",
+  "width": 16,
+  "height": 200,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0, "w": 16, "h": 200, "fill": "core" }
+  ]
+}

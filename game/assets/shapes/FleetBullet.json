@@ -1,0 +1,16 @@
+{
+ "name": "FleetBullet",
+ "width": 24,
+ "height": 10,
+ "layers": [
+  {
+   "type": "capsule",
+   "fill": "grape",
+   "x1": 5,
+   "y1": 5,
+   "x2": 19,
+   "y2": 5,
+   "r": 4
+  }
+ ]
+}

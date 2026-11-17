@@ -1,0 +1,8 @@
+{
+  "name": "GunBullet",
+  "width": 21,
+  "height": 20,
+  "layers": [
+    { "type": "ellipse", "cx": 10.5, "cy": 10, "rx": 10.5, "ry": 9.6, "fill": "grape" }
+  ]
+}

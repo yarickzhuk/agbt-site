@@ -1,0 +1,9 @@
+{
+  "name": "Spear",
+  "width": 30,
+  "height": 28,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "ring", "points": [15.97,27.73, 16.36,13.67, 16.35,0.0, 30.02,14.29] },
+    { "type": "polygon", "modes": "V", "fill": "ring", "points": [0.0,22.41, 0.0,5.85, 17.78,5.85, 17.78,22.41] }
+  ]
+}
