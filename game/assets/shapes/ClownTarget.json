@@ -1,0 +1,13 @@
+{
+  "name": "ClownTarget",
+  "width": 40,
+  "height": 48,
+  "layers": [
+    { "type": "rect", "x": 6, "y": 8, "w": 28, "h": 4, "fill": "ring", "modes": "V" },
+    { "type": "rect", "x": 13, "y": 2, "w": 14, "h": 6, "fill": "ring", "modes": "V" },
+    { "type": "ellipse", "cx": 20, "cy": 26, "rx": 16, "ry": 16, "fill": "ring", "modes": "V" },
+    { "type": "ellipse", "cx": 14, "cy": 24, "rx": 3, "ry": 3, "fill": "ring", "modes": "V" },
+    { "type": "ellipse", "cx": 26, "cy": 24, "rx": 3, "ry": 3, "fill": "ring", "modes": "V" },
+    { "type": "rect", "x": 12, "y": 34, "w": 16, "h": 6, "fill": "ring", "modes": "V" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Peanut",
+  "width": 30,
+  "height": 18,
+  "layers": [
+    { "type": "ellipse", "cx": 10, "cy": 9, "rx": 9, "ry": 8.4, "fill": "ring", "modes": "V" },
+    { "type": "ellipse", "cx": 20, "cy": 9, "rx": 9, "ry": 8.4, "fill": "ring", "modes": "V" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "LaserBlock",
+  "width": 24,
+  "height": 24,
+  "layers": [
+    { "type": "rect", "x": 1, "y": 1, "w": 22, "h": 22, "fill": "ring" },
+    { "type": "polygon", "fill": "ring", "points": [12,6, 18,12, 12,18, 6,12] }
+  ]
+}

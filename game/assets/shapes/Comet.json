@@ -1,0 +1,8 @@
+{
+  "name": "Comet",
+  "width": 16,
+  "height": 16,
+  "layers": [
+    { "type": "ellipse", "cx": 8, "cy": 8, "rx": 8, "ry": 8, "fill": "grape" }
+  ]
+}

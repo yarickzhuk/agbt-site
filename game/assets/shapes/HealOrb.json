@@ -1,0 +1,16 @@
+{
+  "name": "HealOrb",
+  "width": 24,
+  "height": 24,
+  "layers": [
+    { "type": "ellipse", "cx": 12, "cy": 12, "rx": 11.5, "ry": 11.5, "fill": "heal", "modes": "8,16,32",
+      "gradientTo": "healLight", "gradientDir": "y" },
+    { "type": "ellipse", "cx": 12, "cy": 17, "rx": 11.5, "ry": 7, "fill": "healDark", "modes": "16,32" },
+    { "type": "rect", "x": 4, "y": 9.5, "w": 16, "h": 5, "fill": "white", "modes": "8,16,32" },
+    { "type": "ellipse", "cx": 8, "cy": 6, "rx": 3.5, "ry": 2.2, "fill": "healLight", "modes": "32" },
+
+    { "type": "ellipse", "cx": 12, "cy": 12, "rx": 11.5, "ry": 11.5, "fill": "heal", "modes": "V" },
+    { "type": "polygon", "modes": "V", "fill": "white",
+      "points": [4,9.5, 20,9.5, 20,14.5, 4,14.5] }
+  ]
+}
