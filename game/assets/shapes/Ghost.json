@@ -1,0 +1,14 @@
+{
+  "name": "Ghost",
+  "width": 60,
+  "height": 76,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "ring",
+      "points": [
+        4,30, 7.48,17, 17,7.48, 30,4, 43,7.48, 52.52,17, 56,30,
+        56,60, 47,72, 38,58, 30,72, 22,58, 13,72, 4,60
+      ] },
+    { "type": "ellipse", "modes": "V", "fill": "core", "cx": 20, "cy": 30, "rx": 4, "ry": 5 },
+    { "type": "ellipse", "modes": "V", "fill": "core", "cx": 40, "cy": 30, "rx": 4, "ry": 5 }
+  ]
+}

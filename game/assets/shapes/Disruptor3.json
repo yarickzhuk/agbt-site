@@ -1,0 +1,10 @@
+{
+  "name": "Disruptor3",
+  "width": 154.41,
+  "height": 255.63,
+  "layers": [
+    { "type": "polygon", "fill": "grape", "points": [34.41,147.42, 34.41,106.42, 133.41,106.42, 133.41,147.42] },
+    { "type": "capsule", "fill": "grape", "x1": 134.16, "y1": 124.02, "x2": 141.16, "y2": 124.02, "r": 1 },
+    { "type": "ellipse", "fill": "grape", "cx": 148.16, "cy": 123.77, "rx": 5, "ry": 5 }
+  ]
+}

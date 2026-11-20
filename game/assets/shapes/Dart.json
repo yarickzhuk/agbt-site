@@ -1,0 +1,10 @@
+{
+  "name": "Dart",
+  "width": 36,
+  "height": 10,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "grape",
+      "points": [9,4.75, 20,1, 35,4.75, 20,8.5] },
+    { "type": "ellipse", "cx": 4.75, "cy": 4.75, "rx": 4.75, "ry": 4.75, "fill": "ring", "modes": "V" }
+  ]
+}

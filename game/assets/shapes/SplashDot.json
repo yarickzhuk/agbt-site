@@ -1,0 +1,12 @@
+{
+  "name": "SplashDot",
+  "width": 16,
+  "height": 16,
+  "layers": [
+    { "type": "ellipse", "cx": 8, "cy": 8, "rx": 8, "ry": 8, "fill": "core", "modes": "8,16" },
+    { "type": "ellipse", "cx": 8, "cy": 8, "rx": 8, "ry": 8, "fill": "coreMid", "modes": "32",
+      "gradientTo": "core", "gradientDir": "y" },
+    { "type": "ellipse", "cx": 8, "cy": 12.5, "rx": 6.5, "ry": 3, "fill": "coreDark", "clip": true, "modes": "16,32" },
+    { "type": "ellipse", "cx": 5.5, "cy": 4.2, "rx": 2.4, "ry": 1.5, "fill": "coreLight", "clip": true, "modes": "32" }
+  ]
+}

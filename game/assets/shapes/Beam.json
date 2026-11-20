@@ -1,0 +1,14 @@
+{
+  "name": "Beam",
+  "width": 1600,
+  "height": 160,
+  "layers": [
+    { "type": "polygon", "fill": "core", "points": [1040, 64, 1575, 64] },
+    { "type": "polygon", "fill": "core", "points": [1040, 96, 1575, 96] },
+    { "type": "polygon", "fill": "ring", "points": [820, 52, 1045, 52] },
+    { "type": "polygon", "fill": "ring", "points": [820, 108, 1045, 108] },
+    { "type": "polygon", "fill": "ring", "points": [1045, 52, 1045, 108] },
+    { "type": "ellipse", "cx": 800, "cy": 80, "rx": 62, "ry": 62, "fill": "ring" },
+    { "type": "ellipse", "cx": 800, "cy": 80, "rx": 34, "ry": 34, "fill": "ring" }
+  ]
+}

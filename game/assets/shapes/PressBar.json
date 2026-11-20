@@ -1,0 +1,9 @@
+{
+  "name": "PressBar",
+  "width": 40,
+  "height": 200,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0, "w": 40, "h": 200, "fill": "core" },
+    { "type": "rect", "x": 6, "y": 8, "w": 28, "h": 184, "fill": "coreLight" }
+  ]
+}
