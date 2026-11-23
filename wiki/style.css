@@ -23,3 +23,5 @@ figcaption { padding:8px 12px; font-size:.85rem; color:var(--dim); }
 .todo { color:var(--dim); font-style:italic; }
 footer { border-top:1px solid var(--line); margin-top:56px; padding-block:24px; color:var(--dim); font-size:.9rem; }
 @media (max-width:720px) { .top { grid-template-columns:minmax(0,1fr); } }
+ul, ol { margin:0 0 14px; padding-left:1.3em; max-width:65ch; }
+li { margin-bottom:6px; }
