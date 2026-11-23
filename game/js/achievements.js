@@ -14,6 +14,7 @@
 import { SCREEN_W, SCREEN_H } from './core.js';
 import { paletteColor } from './retro.js';
 import { input } from './input.js';
+import { tappedAnywhere } from './tap.js';
 import { getAchievementIds, addAchievementId, getLifetimeScore,
          getLifetimeDamage, addLifetimeDamage, getLifetimeDeaths, addLifetimeDeath } from './settings.js';
 
@@ -290,7 +291,7 @@ export function showAchievements(world) {
     header.anchor.set(0.5);
     header.position.set(SCREEN_W / 2, 158);
     const hint = new PIXI.Text(
-      (PAGES.length > 1 ? '← →  PAGE      ' : '') + 'X  BACK', style(15));
+      (PAGES.length > 1 ? (world.isMobile ? 'TAP  NEXT PAGE      ' : '← →  PAGE      ') : '') + 'X  BACK', style(15));
     hint.anchor.set(0.5);
     hint.position.set(SCREEN_W / 2, SCREEN_H - 30);
     hint.alpha = 0.7;
@@ -326,6 +327,8 @@ export function showAchievements(world) {
     const step = () => {
       if (PAGES.length > 1 && input.wasPressed('left'))  { page = (page + PAGES.length - 1) % PAGES.length; draw(); world.audio.play('levelSelectPress', 0.5); }
       if (PAGES.length > 1 && input.wasPressed('right')) { page = (page + 1) % PAGES.length; draw(); world.audio.play('levelSelectPress', 0.5); }
+      const side = PAGES.length > 1 && tappedAnywhere() ? 1 : 0;   // a phone: tap for the next page (wraps round)
+      if (side) { page = (page + side + PAGES.length) % PAGES.length; draw(); world.audio.play('levelSelectPress', 0.5); }
       if (input.backPressed()) {
         world.app.ticker.remove(step);
         world.stage.removeChild(layer);

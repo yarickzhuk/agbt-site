@@ -3,6 +3,7 @@
 // input edges each frame themselves; the main loop is dormant during end
 // screens). Resolve when the player finishes.
 import { input } from './input.js';
+import { tapOn, tappedAnywhere } from './tap.js';
 import { SCREEN_W, SCREEN_H, formatScore } from './core.js';
 import { topScores, submitScore, isNameClaimed } from './leaderboard.js';
 import { createKeypad } from './mobile.js';
@@ -113,7 +114,9 @@ export function enterInitials(world) {
       text('▲', 20, CYAN, cx + (i - 1) * gap, y - 52));
     marks.forEach(m => layer.addChild(m));
 
-    layer.addChild(text('↑↓ LETTER   ←→ SLOT   Z / SPACE  OK', 18, CYAN, SCREEN_W / 2, SCREEN_H / 2 + 90)).alpha = 0.7;
+    layer.addChild(text(world.isMobile ? 'TAP A LETTER TO CHANGE IT' : '↑↓ LETTER   ←→ SLOT   Z / SPACE  OK', 18, CYAN, SCREEN_W / 2, SCREEN_H / 2 + 90)).alpha = 0.7;
+    // a phone: an OK to tap, instead of pressing FIRE three times
+    const okBtn = world.isMobile ? layer.addChild(text('OK', 34, WHITE, SCREEN_W / 2, SCREEN_H / 2 + 150)) : null;
     world.stage.addChild(layer);
 
     const redraw = () => {
@@ -129,7 +132,13 @@ export function enterInitials(world) {
       if (input.wasPressed('down')) { slots[cur] = (slots[cur] + 25) % 26; redraw(); }
       if (input.wasPressed('left') && cur > 0) { cur--; redraw(); }
       if (input.wasPressed('right') && cur < 2) { cur++; redraw(); }
-      if (t > 0.3 && input.wasPressed('fire')) {
+      // a phone: tap a letter for the next one (Z wraps to A)
+      const tp = input.tapAt();
+      const g = tp ? glyphs.findIndex(gl => Math.abs(tp.x - gl.x) < gap / 2 && Math.abs(tp.y - gl.y) < 60) : -1;
+      if (g >= 0) { cur = g; slots[g] = (slots[g] + 1) % 26; redraw(); }
+      const tapOk = t > 0.3 && okBtn && tapOn(okBtn, 40, 20);
+      if (tapOk) cur = 2;
+      if (t > 0.3 && (input.wasPressed('fire') || tapOk)) {
         if (cur < 2) { cur++; redraw(); }
         else {
           world.app.ticker.remove(step);
@@ -159,7 +168,7 @@ function notice(world, title, subtitle) {
     let t = 0;
     const step = () => {
       t += world.app.ticker.deltaMS / 1000;
-      if (t > 0.4 && input.wasPressed('fire')) {
+      if (t > 0.4 && (input.wasPressed('fire') || tappedAnywhere())) {
         world.app.ticker.remove(step);
         world.stage.removeChild(layer); layer.destroy({ children: true });
         resolve();
@@ -337,7 +346,7 @@ export function showScoreboard(world, highlightName = null) {
       // [ESC] backs out immediately -- no `t > 0.4` gate needed the way fire
       // has one, since Escape was never the key used to *enter* this screen
       // (see input.js's own armGuard doc for why fire needs that guard).
-      if ((t > 0.4 && input.wasPressed('fire')) || input.backPressed()) {
+      if ((t > 0.4 && (input.wasPressed('fire') || tappedAnywhere())) || input.backPressed()) {
         world.app.ticker.remove(step);
         world.stage.removeChild(layer); layer.destroy({ children: true });
         resolve();

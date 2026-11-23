@@ -52,6 +52,10 @@ function setUp(k) {
 // "press any key" sound gate (intro.js) and the first-input audio unlock
 // have to accept a touch too, or the game sits on its gate looking frozen.
 let tappedEdge = false;
+// A phone tap on the game screen, in design coordinates (mobile.js sets it on
+// a quick touch that didn't drag and didn't land on a control button), so
+// menus can be tapped directly instead of steered with the joystick.
+let tapPoint = null;
 const pointersDown = new Set();
 window.addEventListener('pointerdown', e => {
   tappedEdge = true;
@@ -111,9 +115,13 @@ export const input = {
   setMirror: on => { on = !!on; if (on === mirror) return; mirror = on; swapHeld(down); },
   isMirrored: () => mirror,
   // clear per-frame edges; call at end of each frame
-  endFrame: () => { pressed.clear(); released.clear(); tappedEdge = false; },
+  endFrame: () => { pressed.clear(); released.clear(); tappedEdge = false; tapPoint = null; },
   // True for the frame after a tap/click anywhere on the page.
   tapped: () => tappedEdge,
+  // This frame's tap on the screen ({ x, y } in design units) or null.
+  // See tap.js for the helpers menus use to test it against their rows.
+  tapAt: () => tapPoint,
+  setTap: p => { tapPoint = p; },
   // True while a finger/mouse button is down anywhere on the page (the
   // level title cards' "press any key" accepts a touch as a key).
   touching: () => pointersDown.size > 0,

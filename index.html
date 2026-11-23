@@ -372,7 +372,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: 
     f.allowFullscreen = true;
     box.replaceChildren(f);
     f.addEventListener('load', () => { try { f.contentWindow.focus(); } catch (e) { f.focus(); } });
-    fs.hidden = false;
+    fs.hidden = !(document.fullscreenEnabled || document.webkitFullscreenEnabled);   // not on an iPhone
     fs.onclick = () => (f.requestFullscreen || f.webkitRequestFullscreen || (() => {})).call(f);
   });
 })();

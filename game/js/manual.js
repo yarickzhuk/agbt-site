@@ -6,6 +6,7 @@
 // itself uses for them.
 import { SCREEN_W, SCREEN_H } from './core.js';
 import { input } from './input.js';
+import { tappedAnywhere } from './tap.js';
 import { paletteColor } from './retro.js';
 
 // Pictures a manual page shows instead of text (preloaded at boot, main.js).
@@ -513,7 +514,7 @@ export function showManual(world) {
     world.stage.addChild(layer);
     const head = new PIXI.Text('MANUAL', { fontFamily: FONT, fontSize: 18, fill: 0xffffff, letterSpacing: 6 });
     head.anchor.set(0.5); head.position.set(SCREEN_W / 2, 50); head.alpha = 0.6;
-    const hint = new PIXI.Text(world.isMobile ? '◄ ►  TURN THE PAGE      X  BACK' : '← →  TURN THE PAGE      X  BACK',
+    const hint = new PIXI.Text(world.isMobile ? 'TAP  NEXT PAGE      X  BACK' : '← →  TURN THE PAGE      X  BACK',
       { fontFamily: FONT, fontSize: 15, fill: 0xffffff, letterSpacing: 3 });
     hint.anchor.set(0.5); hint.position.set(SCREEN_W / 2, SCREEN_H - 50); hint.alpha = 0.7;
     layer.addChild(head, hint);
@@ -559,6 +560,7 @@ export function showManual(world) {
     const step = () => {
       if (input.wasPressed('left')) turn(-1);
       if (input.wasPressed('right') || input.wasPressed('fire')) turn(1);
+      if (tappedAnywhere()) turn(1);   // a phone: tap for the next page (wraps round)
       if (input.backPressed()) {
         world.app.ticker.remove(step);
         world.stage.removeChild(layer); layer.destroy({ children: true });

@@ -114,8 +114,33 @@ export function setToxicMode(on) {
 
 // OPTIONS → SCREEN BORDER: the art (Kangunroo, Plasmadrache, their names)
 // drawn in the empty bars around the game (mobile.js). On by default --
-// only an explicit OFF is stored.
-export function getScreenBorder() { return load().border !== false; }
+// except on a phone whose side bars would be too narrow to hold the
+// joystick and FIRE (per direct request, "do all four phone fixes"): there
+// the controls sit on the game anyway, so the border starts OFF and the game
+// widens to the screen instead. A choice made in OPTIONS is stored and wins.
+export function getScreenBorder() {
+  const b = load().border;
+  return b === undefined ? borderFitsControls() : b !== false;
+}
+// mobile.js's BAR_CONTROLS_MIN (2 x STICK_R + 30 = 174 design units): a side
+// bar that wide holds the joystick / FIRE. A 900x700 game fitted to the
+// page's height leaves bars of (700 x aspect - 900) / 2.
+// Worked out once per page load, so turning the phone (the browser bars
+// change the page's shape) never flips it mid-session.
+const BAR_CONTROLS_MIN = 174;
+let fitsMemo = null;
+function borderFitsControls() {
+  if (fitsMemo === null) fitsMemo = measureFit();
+  return fitsMemo;
+}
+function measureFit() {
+  try {
+    if (!matchMedia('(hover: none) and (pointer: coarse)').matches) return true;
+    const w = window.innerWidth, h = window.innerHeight;
+    const aspect = Math.max(w, h) / Math.max(1, Math.min(w, h));
+    return (700 * aspect - 900) / 2 >= BAR_CONTROLS_MIN;
+  } catch (e) { return true; }
+}
 export function setScreenBorder(on) {
   const o = load();
   o.border = !!on;

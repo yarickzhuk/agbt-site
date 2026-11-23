@@ -97,8 +97,9 @@ const TRIANGLES = {
 };
 
 const EMBLEM_SCALE = 1.32;
+const MOBILE_DROP = 112;   // phone: everything below the touch buttons' row
 
-export function createStageSelectView({ rows, screenW, screenH, weaponName, canSwitchWeapon }) {
+export function createStageSelectView({ rows, screenW, screenH, weaponName, canSwitchWeapon, mobile }) {
   const container = new PIXI.Container();
   container.zIndex = 200;
 
@@ -107,11 +108,15 @@ export function createStageSelectView({ rows, screenW, screenH, weaponName, canS
     fontFamily: FONT, fontSize: 40, fill: CYAN, letterSpacing: 4, align: 'center',
   });
   title.anchor.set(0.5);
-  title.position.set(screenW / 2, 38);
+  // A phone's X/V/↻/SAVE/LOAD buttons sit along the top (mobile.js, y 38-122),
+  // so there the title and emblem start below them; the stat block still
+  // clears the hint.
+  const drop = mobile ? MOBILE_DROP : 0;
+  title.position.set(screenW / 2, 38 + drop);
   container.addChild(title);
 
   // ---- the triforce emblem, the screen's centrepiece ----------------------
-  const emblemX = screenW / 2, emblemY = 250;
+  const emblemX = screenW / 2, emblemY = 250 + drop;
   const toScreen = ([x, y]) => [
     emblemX + (x - EMBLEM_W / 2) * EMBLEM_SCALE,
     emblemY + (y - EMBLEM_H / 2) * EMBLEM_SCALE,
@@ -151,7 +156,7 @@ export function createStageSelectView({ rows, screenW, screenH, weaponName, canS
       fontFamily: FONT, fontSize: 15, fill: CYAN, letterSpacing: 1, align: 'center',
     });
     t.anchor.set(0.5, 0);
-    t.position.set(emblemX, statsY + i * 20);
+    t.position.set(emblemX, statsY + i * (mobile ? 22 : 20));   // phone text is drawn bigger (outline.js)
     container.addChild(t);
     statLines.push(t);
   }
@@ -170,12 +175,12 @@ export function createStageSelectView({ rows, screenW, screenH, weaponName, canS
   }
 
   // ---- hint + weapon readout -----------------------------------------------
-  const hint = new PIXI.Text('↑ ↓  CHOOSE      Z / SPACE  SELECT      X  BACK', {
+  const hint = new PIXI.Text(mobile ? 'TAP A STAGE TO LOOK, TAP AGAIN TO PLAY      X  BACK' : '↑ ↓  CHOOSE      Z / SPACE  SELECT      X  BACK', {
     fontFamily: FONT, fontSize: 15, fill: CYAN, letterSpacing: 3, align: 'center',
   });
   hint.anchor.set(0.5);
   hint.alpha = 0.7;
-  hint.position.set(screenW / 2, screenH - 32);
+  hint.position.set(screenW / 2, screenH - (mobile ? 40 : 32));
   container.addChild(hint);
 
   const weapon = new PIXI.Text('', {
@@ -183,7 +188,7 @@ export function createStageSelectView({ rows, screenW, screenH, weaponName, canS
   });
   weapon.anchor.set(0.5);
   weapon.alpha = 0.85;
-  weapon.position.set(screenW / 2, screenH - 12);
+  weapon.position.set(screenW / 2, screenH - (mobile ? 14 : 12));
   container.addChild(weapon);
 
   function setWeapon(name) {
@@ -223,7 +228,19 @@ export function createStageSelectView({ rows, screenW, screenH, weaponName, canS
     drawTriangle(t.gfx, t.verts, onCyan ? HILITE_CYAN() : HILITE_DARKBLUE());
   }
 
-  return { container, setCursor, setWeapon, update };
+  // Which row's triangle holds design point (x, y), or -1 (a phone's tap,
+  // tap.js). The container sits at the origin, so its coords are the screen's.
+  const inTri = ([ax, ay], [bx, by], [cx, cy], x, y) => {
+    const d1 = (x - bx) * (ay - by) - (ax - bx) * (y - by);
+    const d2 = (x - cx) * (by - cy) - (bx - cx) * (y - cy);
+    const d3 = (x - ax) * (cy - ay) - (cx - ax) * (y - ay);
+    return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+  };
+  const rowAt = (x, y) => rows.findIndex(r => {
+    const sh = r && triShapes[r.id];
+    return !!sh && sh.verts.length >= 3 && inTri(sh.verts[0], sh.verts[1], sh.verts[2], x, y);
+  });
+  return { container, setCursor, setWeapon, update, rowAt };
 }
 
 // `glow`: a cleared level's triangle reads as "glowing yellow" -- per this

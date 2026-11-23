@@ -37,6 +37,7 @@
 import { showAchievements, unlockAchievement } from './achievements.js';
 import { SCREEN_W, SCREEN_H, BOOT_BORDER, formatScore } from './core.js';
 import { input } from './input.js';
+import { tapRow, tapOn, tappedAnywhere } from './tap.js';
 import { encodePin, SAVE_LEVELS } from './pin.js';
 import { enterInitialsAndSubmit, showScoreboard, getPlayerName } from './scoreui.js';
 import { paletteColor, buildSprite } from './retro.js';
@@ -167,7 +168,7 @@ function showQuitScreen(world) {
     world.stage.addChild(layer);
     const firePressed = input.armGuard('fire');
     const step = () => {
-      if (input.backPressed() || firePressed()) {
+      if (input.backPressed() || firePressed() || tappedAnywhere()) {
         world.app.ticker.remove(step);
         world.stage.removeChild(layer); layer.destroy({ children: true });
         input.endFrame();
@@ -332,6 +333,10 @@ export function showMenu(world, opts = {}) {
       if (!fixedRules && DIFFS.length > 1 && input.wasPressed('right')) { diffIdx = (diffIdx + 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
       if (input.wasPressed('up'))   { idx = (idx + MENU_ITEMS.length - 1) % MENU_ITEMS.length; place(); }
       if (input.wasPressed('down')) { idx = (idx + 1) % MENU_ITEMS.length; place(); }
+      // a phone: tap a row to pick it; tap the difficulty line for the next difficulty
+      const tapped = tapRow(items, gap);
+      if (tapped >= 0) { idx = tapped; place(); select(idx); return; }
+      if (!fixedRules && DIFFS.length > 1 && tapOn(diff, 60)) { diffIdx = (diffIdx + 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
       if (firePressed()) { select(idx); return; }
       input.endFrame();
     };
@@ -425,7 +430,7 @@ function showOptions(world) {
     };
     place();
 
-    const hint = new PIXI.Text('↑ ↓  CHOOSE      ← →  ADJUST      Z / SPACE  SELECT      X  BACK',
+    const hint = new PIXI.Text(world.isMobile ? 'TAP A ROW TO OPEN IT OR CHANGE IT      X  BACK' : '↑ ↓  CHOOSE      ← →  ADJUST      Z / SPACE  SELECT      X  BACK',
       { ...SUB_STYLE, fontSize: 15 });
     hint.anchor.set(0.5);
     hint.position.set(SCREEN_W / 2, itemY(ROWS.length) + 30);
@@ -454,10 +459,10 @@ function showOptions(world) {
       input.endFrame();
     };
 
-    const adjust = dir => {
+    const adjust = (dir, wrap = false) => {
       const r = ROWS[idx];
       if (r.key === 'volume') {
-        volume = Math.max(0, Math.min(1, volume + dir * 0.1));
+        volume = wrap && volume >= 0.999 ? 0 : Math.max(0, Math.min(1, Math.round((volume + dir * 0.1) * 10) / 10));
         setMasterVolume(volume);
         world.audio.setMasterVolume(volume);
       } else if (r.key === 'resolution') {
@@ -506,6 +511,13 @@ function showOptions(world) {
       if (input.wasPressed('down'))  { idx = (idx + 1) % ROWS.length; place(); showNote(); }
       if (input.wasPressed('left'))  adjust(-1);
       if (input.wasPressed('right')) adjust(1);
+      // a phone: tap a row; a setting steps to its next value (VOLUME past 100% wraps to 0%)
+      const tapped = tapRow(items, gap, 260);
+      if (tapped >= 0) {
+        idx = tapped; place(); showNote();
+        if (ROWS[idx].type === 'action') { select(idx); return; }
+        adjust(1, true);
+      }
       if (input.backPressed()) {
         close();
         // the game's width is set at boot from this (core.js): reload to apply it
@@ -575,7 +587,7 @@ export function showCostumes(world) {
     passive.anchor.set(0.5);
     passive.position.set(620, 520);
     passive.style.fill = paletteColor('heal');
-    const hint = new PIXI.Text('↑ ↓  CHOOSE      Z / SPACE  EQUIP      X  BACK', { ...SUB_STYLE, fontSize: 15 });
+    const hint = new PIXI.Text(world.isMobile ? 'TAP TO LOOK      TAP AGAIN TO EQUIP      X  BACK' : '↑ ↓  CHOOSE      Z / SPACE  EQUIP      X  BACK', { ...SUB_STYLE, fontSize: 15 });
     hint.anchor.set(0.5);
     hint.position.set(SCREEN_W / 2, 600);
     hint.alpha = 0.7;
@@ -598,7 +610,7 @@ export function showCostumes(world) {
       layer.addChild(preview);
       const c = COSTUMES[idx];
       note.text = !unlocked[idx] ? 'LOCKED — CLEAR ' + c.levelName
-        : (c.id === equipped ? 'EQUIPPED' : 'PRESS FIRE TO EQUIP');
+        : (c.id === equipped ? 'EQUIPPED' : world.isMobile ? 'TAP AGAIN TO EQUIP' : 'PRESS FIRE TO EQUIP');
       note.style.fill = !unlocked[idx] ? paletteColor('blood') : (c.id === equipped ? paletteColor('hull') : 0xffffff);
       passive.text = unlocked[idx] && c.passive ? 'PASSIVE: ' + c.passive : '';
     };
@@ -616,7 +628,12 @@ export function showCostumes(world) {
       if (input.wasPressed('up'))   { idx = (idx + COSTUMES.length - 1) % COSTUMES.length; world.audio.play('levelSelectPress', 0.5); place(); }
       if (input.wasPressed('down')) { idx = (idx + 1) % COSTUMES.length; world.audio.play('levelSelectPress', 0.5); place(); }
       if (input.backPressed()) { close(); resolve(); return; }
-      if (firePressed()) {
+      // a phone: tap a costume to look at it, tap it again (or its preview) to equip it
+      let tapEquip = false;
+      const tapped = tapRow(items, gap, 60);
+      if (tapped >= 0 && tapped !== idx) { idx = tapped; world.audio.play('levelSelectPress', 0.5); place(); }
+      else if (tapped === idx || (preview && tapOn(preview, 40, 40))) tapEquip = true;
+      if (firePressed() || tapEquip) {
         if (unlocked[idx]) {
           equipped = COSTUMES[idx].id;
           setCostumeId(equipped);
@@ -670,7 +687,7 @@ export function showCutscenes(world) {
     const note = new PIXI.Text('', { ...SUB_STYLE, fontSize: 18 });
     note.anchor.set(0.5);
     note.position.set(SCREEN_W / 2, itemY(CUTSCENES.length) + 20);
-    const hint = new PIXI.Text('↑ ↓  CHOOSE      Z / SPACE  WATCH      X  BACK', { ...SUB_STYLE, fontSize: 15 });
+    const hint = new PIXI.Text(world.isMobile ? 'TAP TO WATCH      X  BACK' : '↑ ↓  CHOOSE      Z / SPACE  WATCH      X  BACK', { ...SUB_STYLE, fontSize: 15 });
     hint.anchor.set(0.5);
     hint.position.set(SCREEN_W / 2, itemY(CUTSCENES.length) + 80);
     hint.alpha = 0.7;
@@ -697,7 +714,9 @@ export function showCutscenes(world) {
       if (input.wasPressed('up'))   { idx = (idx + CUTSCENES.length - 1) % CUTSCENES.length; world.audio.play('levelSelectPress', 0.5); place(); }
       if (input.wasPressed('down')) { idx = (idx + 1) % CUTSCENES.length; world.audio.play('levelSelectPress', 0.5); place(); }
       if (input.backPressed()) { close(); resolve(); return; }
-      if (firePressed()) {
+      const tapped = tapRow(items, gap);   // a phone: tap one to watch it
+      if (tapped >= 0) { idx = tapped; place(); }
+      if (firePressed() || tapped >= 0) {
         if (unlocked[idx]) {
           close();
           CUTSCENES[idx].play(world).then(() => showCutscenes(world)).then(resolve);
@@ -791,7 +810,9 @@ function endScreen(world, { title, titleFill = 0xffffff, jingle, sound, lines, o
     t += world.app.ticker.deltaMS / 1000;
     if (input.wasPressed('up')) { idx = (idx + options.length - 1) % options.length; place(); }
     if (input.wasPressed('down')) { idx = (idx + 1) % options.length; place(); }
-    if (t > 0.4 && input.wasPressed('fire')) {
+    const tapped = t > 0.4 ? tapRow(opt, 46) : -1;   // a phone: tap an option to pick it
+    if (tapped >= 0) { idx = tapped; place(); }
+    if (t > 0.4 && (input.wasPressed('fire') || tapped >= 0)) {
       world.app.ticker.remove(step);
       options[idx].run({ score, teardown });
       return;   // input.endFrame skipped on purpose — screen is torn down / reloading

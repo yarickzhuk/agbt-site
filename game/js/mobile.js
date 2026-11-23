@@ -561,6 +561,35 @@ function circleButton(parent, pos, r, label, fontSize) {
   return b;
 }
 
+// A top-row button: an invisible SMALL_R touch target holding the drawn
+// circle (`b.face`), which can be shrunk and faded without shrinking the
+// target. `label` is text, or an element (the full-screen icon).
+function smallButton(parent, pos, label, fontSize) {
+  const b = el('div', 'position:absolute;touch-action:none;user-select:none;', parent);
+  const face = el('div', BASE_CSS + 'inset:0;font-size:' + fontSize + 'px;transition:transform .15s,opacity .15s;', b);
+  if (typeof label === 'string') face.textContent = label; else face.appendChild(label);
+  b.face = face;
+  const reflow = () => place(b, pos.x - SMALL_R, pos.y - SMALL_R, SMALL_R * 2, SMALL_R * 2);
+  reflow();
+  reflowListeners.add(reflow);
+  return b;
+}
+
+// Four corner brackets: the full-screen button's icon.
+function fullscreenIcon() {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.style.cssText = 'width:46%;height:46%;overflow:visible;';
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', 'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#fff');
+  path.setAttribute('stroke-width', '2.4');
+  svg.appendChild(path);
+  return svg;
+}
+
 const STICK_REST = { x: 0, y: 0 };   // where the base sits when idle (placeControls)
 const STICK_R = 72;
 // A big invisible catch zone around the rest position: touching ANYWHERE in
@@ -592,12 +621,27 @@ function placeControls(barD) {
 }
 placeControls(0);
 const SMALL_R = 42;
+// The top row (X, V, ↻, SAVE, LOAD, and full screen on the website). Each
+// button keeps a SMALL_R touch target; its pos is set by layoutTopRow, which
+// packs the visible ones from the right (full screen goes top-left). During a level the row sits just
+// under the HUD's top line and is drawn smaller and fainter (TOP_ROW_LEVEL), so it hides less of the
+// play field; the touch targets stay the same size.
+const TOP_ROW_GAP = 110;
+const TOP_ROW_MENU = { y: 80, face: 1, alpha: 1 };
+const TOP_ROW_LEVEL = { y: 92, face: 0.7, alpha: 0.42 };   // under the HUD's PHASE line
 const PAUSE = { x: SCREEN_W - 50, y: 80 };
 const WEAPON = { x: SCREEN_W - 160, y: 80 };
 const ROTATE = { x: SCREEN_W - 270, y: 80 };
 const SAVE_BTN = { x: SCREEN_W - 380, y: 80 };
 const LOAD_BTN = { x: SCREEN_W - 490, y: 80 };
+const FULL_BTN = { x: SCREEN_W - 600, y: 80 };
+const SITE_MODE = (() => { try { return new URLSearchParams(location.search).has('site'); } catch (e) { return false; } })();
+const FULLSCREEN_OK = (() => { try { return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); } catch (e) { return false; } })();
+const fullscreenEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// A touch counts as a tap on the screen (tap.js) if it lifts within TAP_TIME
+// ms and moved less than TAP_SLOP real pixels.
+const TAP_TIME = 600, TAP_SLOP = 16;
 
 // Turn a page-space drag delta (dx, dy from a pointer's start, in real
 // on-screen pixels) into the game's own un-rotated design-space axes. Only
@@ -673,15 +717,52 @@ export function createTouchControls(world) {
   reflowListeners.add(reflowKnob);
 
   const fireBtn = child(circleButton(layer, FIRE, FIRE_R, 'FIRE', 16));
-  const pauseBtn = child(circleButton(layer, PAUSE, SMALL_R, 'X', 13));
-  const weaponBtn = child(circleButton(layer, WEAPON, SMALL_R, 'V', 13));
+  const pauseBtn = child(smallButton(layer, PAUSE, 'X', 13));
+  const weaponBtn = child(smallButton(layer, WEAPON, 'V', 13));
   // Flips OPTIONS → ORIENTATION between HORIZONTAL and VERTICAL (AUTO goes to
   // VERTICAL first), per direct request: "a button (mobile only) to switch
   // between vertical/horisontal".
-  const rotateBtn = child(circleButton(layer, ROTATE, SMALL_R, '↻', 26));
+  const rotateBtn = child(smallButton(layer, ROTATE, '↻', 26));
   // The manual save (savegame.js): the keyboard's [Shift] / [Enter]
-  const saveBtn = child(circleButton(layer, SAVE_BTN, SMALL_R, 'SAVE', 11));
-  const loadBtn = child(circleButton(layer, LOAD_BTN, SMALL_R, 'LOAD', 11));
+  const saveBtn = child(smallButton(layer, SAVE_BTN, 'SAVE', 11));
+  const loadBtn = child(smallButton(layer, LOAD_BTN, 'LOAD', 11));
+  // Full screen, on the website only (its frame allows it; itch has its own
+  // button), and only where the browser can (not on an iPhone).
+  const fullBtn = child(smallButton(layer, FULL_BTN, fullscreenIcon(), 13));
+
+  // Which top-row buttons show, per direct request ("do all four phone
+  // fixes"): SAVE, LOAD and V only during a level (V on the hub too, where it
+  // switches weapon), and only when they do something; X and ↻ always.
+  const row = [
+    [pauseBtn, PAUSE, () => true],
+    [weaponBtn, WEAPON, m => m === 'hub' || (m === 'level' && !world.weaponForced && world.canSwitchAtAll)],
+    [rotateBtn, ROTATE, () => true],
+    [saveBtn, SAVE_BTN, m => m === 'level' && !world.speedrun && !world.endless],
+    [loadBtn, LOAD_BTN, m => m === 'level' && !world.speedrun && !world.endless],
+    [fullBtn, FULL_BTN, () => SITE_MODE && FULLSCREEN_OK],
+  ];
+  let rowKey = '';
+  const layoutTopRow = () => {
+    const mode = world.inLevel && !world._over ? 'level' : world.inHub ? 'hub' : 'menu';
+    const look = mode === 'level' ? TOP_ROW_LEVEL : TOP_ROW_MENU;
+    const shown = row.map(([, , show]) => !!show(mode));
+    const key = mode + shown.join();
+    if (key === rowKey) return;
+    rowKey = key;
+    let i = 0;
+    row.forEach(([b, pos], j) => {
+      b.style.display = shown[j] ? '' : 'none';
+      if (!shown[j]) return;
+      // full screen sits alone in the top-left corner, clear of the title logo
+      if (b === fullBtn) Object.assign(pos, { x: 50, y: look.y });
+      else Object.assign(pos, { x: SCREEN_W - 50 - TOP_ROW_GAP * i++, y: look.y });
+      b.face.style.transform = look.face === 1 ? '' : 'scale(' + look.face + ')';
+      b.face.style.opacity = look.alpha;
+    });
+    notifyReflow();
+  };
+  layoutTopRow();
+  (function poll() { layoutTopRow(); requestAnimationFrame(poll); })();
 
   // --- Joystick: touching down anywhere in stickZone recentres the base to
   // that point (beginStick), then tracks the drag from there (updateStick).
@@ -759,10 +840,42 @@ export function createTouchControls(world) {
   weaponBtn.addEventListener('pointerdown', () => { input.simulateDown('weapon'); input.simulateUp('weapon'); });
   saveBtn.addEventListener('pointerdown', () => { input.simulateDown('shift'); input.simulateUp('shift'); });
   loadBtn.addEventListener('pointerdown', () => { input.simulateDown('enter'); input.simulateUp('enter'); });
+  fullBtn.addEventListener('click', () => {
+    try {
+      if (fullscreenEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else {
+        const d = document.documentElement;
+        const p = (d.requestFullscreen || d.webkitRequestFullscreen).call(d);
+        if (p && p.catch) p.catch(() => {});
+      }
+    } catch (e) {}
+  });
   rotateBtn.addEventListener('pointerdown', () => {
     setOrientation(getOrientation() === 'vertical' ? 'horizontal' : 'vertical');
     refitCanvas();
   });
+
+  // --- Taps on the screen itself (tap.js): a quick touch that didn't drag
+  // and didn't land on one of the buttons above becomes input.tapAt(), in
+  // design units, so menus can be pressed directly. A tap in the joystick's
+  // catch zone counts too (with no drag the stick does nothing anyway).
+  [fireBtn, pauseBtn, weaponBtn, rotateBtn, saveBtn, loadBtn, fullBtn].forEach(b => { b.dataset.notap = '1'; });
+  const taps = new Map();
+  window.addEventListener('pointerdown', e => {
+    if (e.target && e.target.closest && e.target.closest('[data-notap]')) return;
+    taps.set(e.pointerId, { x: e.clientX, y: e.clientY, t: performance.now() });
+  }, true);
+  const tapEnd = e => {
+    const s = taps.get(e.pointerId);
+    taps.delete(e.pointerId);
+    if (!s || e.type !== 'pointerup') return;
+    if (performance.now() - s.t > TAP_TIME || Math.hypot(e.clientX - s.x, e.clientY - s.y) > TAP_SLOP) return;
+    const p = pageToDesign(e.clientX, e.clientY);
+    if (input.isMirrored()) p.x = SCREEN_W - p.x;   // DELTA: the canvas is drawn mirrored
+    input.setTap(p);
+  };
+  window.addEventListener('pointerup', tapEnd, true);
+  window.addEventListener('pointercancel', tapEnd, true);
 
   const controls = {
     hide() { layer.style.display = 'none'; },
@@ -780,6 +893,7 @@ export function createTouchControls(world) {
 export function createKeypad(world, { charset, onChar, onBackspace, onEnter, onCancel, y0 = SCREEN_H / 2 + 100 }) {
   if (!wrap) return { destroy() {} };
   const layer = el('div', 'position:absolute;inset:0;z-index:10;', wrap);
+  layer.dataset.notap = '1';   // its keys aren't taps on the screen (tap.js)
   const myReflows = [];
 
   const cols = charset.length <= 10 ? 5 : 12;

@@ -59,6 +59,7 @@ export function showStageSelect(world) {
     // by name), so this is safe to call every time the hub is (re)shown --
     // it only actually stops once a level is chosen (see `resolve` below).
     world.audio.loop('stageMenu', 0.5);
+    world.inHub = true;   // mobile.js: the touch V button shows on the hub too
 
     // TUTORIAL is its own title-screen entry now (menu.js), not a hub row --
     // the hub is just the 4 real stages, one per triforce triangle.
@@ -100,7 +101,7 @@ export function showStageSelect(world) {
 
     const view = createStageSelectView({
       rows, screenW: SCREEN_W, screenH: SCREEN_H,
-      weaponName: weapon.name, canSwitchWeapon: canSwitchAtAll,
+      weaponName: weapon.name, canSwitchWeapon: canSwitchAtAll, mobile: world.isMobile,
     });
     // DELTA equipped: the hub is monochrome too (per direct request). On the
     // view itself, so it goes with it when the hub closes.
@@ -128,6 +129,7 @@ export function showStageSelect(world) {
     };
 
     const close = () => {
+      world.inHub = false;
       world.app.ticker.remove(step);
       world.stage.removeChild(view.container);
       view.container.destroy({ children: true });
@@ -152,11 +154,17 @@ export function showStageSelect(world) {
       }
       if (input.wasPressed('up')) move(-1);
       if (input.wasPressed('down')) move(1);
+      // a phone: tap a triangle to look at its stage, tap it again to play it
+      let tapGo = false;
+      const tp = input.tapAt();
+      const tapped = tp && view.rowAt ? view.rowAt(tp.x, tp.y) : -1;
+      if (tapped >= 0 && tapped !== idx) { idx = tapped; view.setCursor(idx); world.audio.play('levelSelectPress', 0.6); }
+      else if (tapped >= 0) tapGo = true;
       if (input.backPressed()) {
         world.audio.stopLoop('stageMenu');
         close(); resolve(null); return;
       }
-      if (firePressed()) {
+      if (firePressed() || tapGo) {
         const it = items[idx];
         if (isUnlocked(it.level)) {
           // levelSelectStart plays here, on actually confirming a level --

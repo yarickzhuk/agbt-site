@@ -24,6 +24,22 @@ function trailerUrl() {
   try { return new URLSearchParams(location.search).get('trailer') || TRAILER_URL; } catch (e) { return TRAILER_URL; }
 }
 
+// The website's opening plays once per browser, on the first boot of a tab
+// (never on the game's own reloads: Stage Clear, TRY AGAIN, a LOAD...).
+// Per direct report: "on the website trailer and a cutscene shows way too
+// damn often". Before, ?site=1 survived every location.reload(), so the
+// trailer replayed on each one, and every visit forced the intro too.
+const SITE_SEEN_KEY = 'agbt_site_opening_seen';   // localStorage
+export function shouldPlaySiteOpening() {
+  if (!isSiteMode()) return false;
+  try {
+    if (sessionStorage.getItem('agbt_intro_seen')) return false;   // a reload inside this tab
+    if (localStorage.getItem(SITE_SEEN_KEY)) return false;          // seen on an earlier visit
+    localStorage.setItem(SITE_SEEN_KEY, '1');
+  } catch (e) {}
+  return true;
+}
+
 export function isSiteMode() {
   try { return new URLSearchParams(location.search).has('site'); } catch (e) { return false; }
 }

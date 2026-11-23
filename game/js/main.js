@@ -16,7 +16,7 @@ import { showMenu, showGameOver, showStageClear, showVictory, showSpeedrunEnd, s
 import { showStageSelect } from './stageselect.js';
 import { levelById } from './levels/registry.js';
 import { INTRO_PNGS, shouldPlayIntro, playIntro } from './intro.js';
-import { isSiteMode, playTrailer } from './trailer.js';
+import { isSiteMode, shouldPlaySiteOpening, playTrailer } from './trailer.js';
 import { OUTRO_PNGS, playOutro } from './outro.js';
 import { MANUAL_PNGS } from './manual.js';
 import { unlockAchievement, showPendingAchievements, ACHIEVEMENT_PNGS, checkScoreAchievements,
@@ -96,10 +96,12 @@ function updateBootProgress(done, total) {
 }
 
 async function main() {
-  // The website (index.html?site=1): the trailer plays while the game loads,
-  // then fades into the intro cutscene (trailer.js).
+  // The website (index.html?site=1): on a browser's first visit the trailer
+  // plays while the game loads, then fades into the intro (trailer.js). Later
+  // visits, and the game's own reloads, go straight to the title.
   const siteMode = isSiteMode();
-  const trailerDone = siteMode ? playTrailer() : null;
+  const siteOpening = shouldPlaySiteOpening();
+  const trailerDone = siteOpening ? playTrailer() : null;
   // A fresh tab/window opening the game wipes saved progress (once per tab
   // session — the game's own location.reload()s between stages / TRY AGAIN
   // stay in the same session and don't re-trigger this). Encourages players
@@ -257,7 +259,7 @@ async function main() {
   // SPEEDRUN MODE's TRY AGAIN (speedrun.js): straight back into a run.
   const speedrunStart = consumeSpeedrunStart();
   const endlessStart = consumeEndlessStart();   // ENDLESS MODE's TRY AGAIN (levels/endless.js)
-  if (!savedLoad && !retryId && !toHub && !speedrunStart && !endlessStart && (shouldPlayIntro() || siteMode)) {
+  if (!savedLoad && !retryId && !toHub && !speedrunStart && !endlessStart && (siteMode ? (shouldPlayIntro(), siteOpening) : shouldPlayIntro())) {
     if (trailerDone) await trailerDone;
     await playIntro(world);
   }
@@ -493,6 +495,7 @@ async function main() {
   // means they cleared it. A cheat-code load jumps straight to its saved
   // phase (see levels/*.js's `run(world, hud, opts)`).
   checkScoreAchievements(world);   // a carried-over or loaded total may already qualify
+  world.inLevel = true;   // mobile.js: SAVE / LOAD / V show only while a level runs
   await level.run(world, hud, savedLoad ? { startPhase: savedLoad.phase, startStage: savedLoad.stage || 0 } : undefined);
   if (endless) return;   // ENDLESS MODE only ends in a death (its result screen)
   if (speedrun && !world.player.dead && !world._over) {
