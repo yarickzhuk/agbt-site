@@ -428,7 +428,7 @@ function pages(mobile) {
       'MIRRORED. NO PASSIVE. HE DOESN\'T NEED ONE.',
     ] },
     { title: 'COSTUMES', lines: [
-      'OPTIONS → COSTUMES. CLEAR A STAGE TO EARN ITS SHIP.',
+      'COSTUMES, ON THE TITLE SCREEN. CLEAR A STAGE TO EARN ITS SHIP.',
       'EACH HAS A PASSIVE: AN UPSIDE AND A DOWNSIDE.',
       '',
       [['CLASSIC', 'hull'], [' - THE STOCK SHIP. NO PASSIVE.', null]],
@@ -467,7 +467,7 @@ function pages(mobile) {
       'TIP: LEARN EACH HAZARD BY ITS SHAPE.',
     ] },
     { title: 'SPEEDRUN MODE', lines: [
-      'OPENS ON THE TITLE SCREEN ONCE YOU BEAT THE GAME.',
+      'TITLE SCREEN → ALTERNATIVE GAME MODES, ONCE YOU BEAT IT.',
       '',
       'EVERY STAGE IN A ROW, THEN OUTER SPACE,',
       'AGAINST THE CLOCK. NO TITLE CARDS, NO PAUSE.',
@@ -480,7 +480,7 @@ function pages(mobile) {
       'YOUR TIME + 1 SECOND.',
     ] },
     { title: 'ENDLESS MODE', lines: [
-      'OPENS ON THE TITLE SCREEN ONCE YOU BEAT THE GAME.',
+      'TITLE SCREEN → ALTERNATIVE GAME MODES, ONCE YOU BEAT IT.',
       '',
       'ROUND AFTER ROUND UNTIL YOU FALL.',
       'EACH ROUND: 4 PHASES OF RANDOM ATTACKS, THEN A BOSS.',
@@ -494,7 +494,6 @@ function pages(mobile) {
     ] },
     { title: 'OPTIONS', lines: [
       'VOLUME, SCREEN SIZE AND DISPLAY MODE.',
-      'COSTUMES  -  NEW SHIPS, ONE FOR EACH STAGE YOU CLEAR.',
       'DEATH HITBOX  -  SHOWS WHAT HIT YOU WHEN YOU DIE.',
       'WATCH CUTSCENES  -  THE INTRO, AND THE ENDING',
       '                   ONCE YOU BEAT THE GAME.',

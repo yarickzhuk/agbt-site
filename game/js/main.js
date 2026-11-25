@@ -155,7 +155,7 @@ async function main() {
     'assets/sprites/stageselect/icon_cyberzoo.png',
     'assets/sprites/stageselect/icon_crazycarnival.png',
     'assets/sprites/stageselect/icon_occultacresburg.png',
-    ...SKIN_PNGS,   // OPTIONS → COSTUMES reskins (costumes.js)
+    ...SKIN_PNGS,   // COSTUMES reskins (costumes.js)
     ...ACHIEVEMENT_PNGS,   // achievement icons (achievements.js)
     ...INTRO_PNGS,  // the intro cutscene (intro.js)
     ...OUTRO_PNGS,  // the final cutscene, part 1 (outro.js)

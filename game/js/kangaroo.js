@@ -161,6 +161,15 @@ export class Kangaroo {
     this.ring.position.set(sx, sy);
     world.stage.addChild(this.ring);
 
+    // "SHOOT!" pops up with the tell, per direct request ("not all players
+    // won't get what to do. So make so when it's time to shot there will be
+    // poping up text like 'shoot!'"). Between the head and the ship.
+    this.shoot = new PIXI.Text('SHOOT!', { fontFamily: 'Tektur, monospace', fontSize: 64, fill: 0xffe400, letterSpacing: 6 });
+    this.shoot.anchor.set(0.5);
+    this.shoot.position.set(SCREEN_W / 2, sy + 245);
+    this.shoot.zIndex = 8; this.shoot.visible = false;
+    world.stage.addChild(this.shoot);
+
     // Full-screen Bang! flash.
     this.flash = new PIXI.Graphics();
     this.flash.beginFill(0xff00d4).drawRect(0, 0, SCREEN_W, SCREEN_H).endFill();
@@ -188,6 +197,8 @@ export class Kangaroo {
     this.container.position.set(this.baseX, this.baseY);
     this.container.rotation = 0;
     this.ring.alpha = 0;
+    // ...except on HARD ("...exept in hard mode"): there you read the tell alone.
+    this.shoot.visible = s === 'tell' && !(this.world.difficulty && this.world.difficulty.id === 'arcade');
     this.setCostume(costume);
     if (s === 'wait') { this.wait = rand(WAIT_MIN, WAIT_MAX); this.tint(NORMAL); this.world.audio.play('kangWait', 0.5); }
   }
@@ -226,6 +237,7 @@ export class Kangaroo {
         this.ring.lineStyle({ width: 6, color: 0xff00d4, alpha: 1 });
         this.ring.drawCircle(0, 0, 150 + 30 * Math.sin(this.t * 40));
         this.ring.alpha = 1;
+        this.shoot.scale.set(1 + 0.6 * Math.max(0, 1 - this.t / 0.08));   // pop in
         if (fire) { this.land(); break; }
         if (this.t >= WINDOW) this.bang();
         break;
@@ -306,6 +318,7 @@ export class Kangaroo {
     if (this.bg && !this.bg.destroyed) this.bg.destroy();
     if (this.container && !this.container.destroyed) this.container.destroy({ children: true });
     if (this.ring && !this.ring.destroyed) this.ring.destroy();
+    if (this.shoot && !this.shoot.destroyed) this.shoot.destroy();
     if (this.flash && !this.flash.destroyed) this.flash.destroy();
   }
 }

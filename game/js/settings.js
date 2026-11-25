@@ -75,7 +75,7 @@ export function setDisplayMode(m) {
   save(o);
 }
 
-// OPTIONS → COSTUMES (costumes.js): the chosen player-ship reskin, plus the
+// COSTUMES (costumes.js): the chosen player-ship reskin, plus the
 // list of reskins ever unlocked on this device. Kept here rather than in
 // progress.js on purpose — progress is wiped every fresh tab, and an earned
 // costume shouldn't vanish with it.

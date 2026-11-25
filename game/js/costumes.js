@@ -1,4 +1,4 @@
-// costumes.js — the player-ship reskins picked in OPTIONS → COSTUMES.
+// costumes.js — the player-ship reskins picked on the title screen's COSTUMES row.
 //
 // Per direct request ("in settings add 'Costumes' option... reskins, you
 // unlock them when completing levels"), with five uploads, one per level:

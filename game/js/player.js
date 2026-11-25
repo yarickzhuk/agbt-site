@@ -103,7 +103,7 @@ export class Player {
     this.moveGlow.visible = false;
     this.container = new PIXI.Container();
     this.container.addChild(this.normalArt, this.moveArt, this.normalGlow, this.moveGlow);
-    // OPTIONS → COSTUMES: a reskin swaps all four stock triangles for one
+    // COSTUMES: a reskin swaps all four stock triangles for one
     // raster sprite (+ its own additive glow copy), its costume picked each
     // frame by costumes.js's shipKey — see that file for each skin's rules.
     this.skin = getCostumeId();
@@ -529,7 +529,7 @@ export class Player {
     return skinSound(this.world, stock);   // DELTA: reversed
   }
 
-  // render() for a costume (OPTIONS → COSTUMES): same rotation/position/
+  // render() for a costume (COSTUMES): same rotation/position/
   // scale-pop/invuln/glow rules as the stock ship, just one sprite whose
   // costume follows the skin's own script.
   renderSkin() {

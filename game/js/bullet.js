@@ -43,7 +43,7 @@ export class Bullet {
 
     const shapeName = this.superCharged ? 'Hadouken' : (charged ? 'Torpedo' : 'Bullet');
     const scale = opts.scale != null ? opts.scale : (this.superCharged ? 1.2 : (charged ? 1 : 0.9));
-    // OPTIONS → COSTUMES: a reskinned ship fires its own skin's shots (same
+    // COSTUMES: a reskinned ship fires its own skin's shots (same
     // plain/torpedo/hadouken choice and the same sizes as the stock shapes).
     this.skin = world.player && world.player.skin !== 'default' ? world.player.skin : null;
     this.skinKind = shapeName.toLowerCase();

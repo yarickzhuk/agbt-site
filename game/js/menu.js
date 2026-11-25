@@ -107,13 +107,15 @@ function extrudeText(str, style, { depth = 7, step = 1.4, shadowColor = 0xb300ff
 const MENU_ROWS = [
   { key: 'stages', label: 'STAGE MENU' },
   { key: 'load', label: 'LOAD GAME', when: () => hasSave() },
+  { key: 'costumes', label: 'COSTUMES' },          // costumes.js (was in OPTIONS)
   { key: 'options', label: 'OPTIONS' },
   { key: 'achievements', label: 'ACHIEVEMENTS' },   // achievements.js
   { key: 'manual', label: 'READ THE MANUAL' },
   { key: 'quit', label: 'QUIT GAME' },
   { key: 'outerspace', label: 'ENTER THE OUTER SPACE', when: () => DEV_ALWAYS_SHOW_OUTERSPACE || WEAPON_LEVEL_IDS.every(isCleared) },
-  { key: 'speedrun', label: 'SPEEDRUN MODE', when: () => isSpeedrunUnlocked() },   // speedrun.js
-  { key: 'endless', label: 'ENDLESS MODE', when: () => isSpeedrunUnlocked() },     // levels/endless.js
+  // SPEEDRUN MODE (speedrun.js) and ENDLESS MODE (levels/endless.js), both
+  // opened by beating the game, behind one row (showAltModes)
+  { key: 'altmodes', label: 'ALTERNATIVE GAME MODES', when: () => isSpeedrunUnlocked() },
 ];
 const ITEM_TOP = 250, ITEM_GAP = 42;
 // The 4 levels that each earn one weapon -- see weapon.js's own doc
@@ -139,7 +141,6 @@ const OPTIONS_ROWS = [
   { type: 'adjust', key: 'border' },
   { type: 'adjust', key: 'toxic' },
   { type: 'adjust', key: 'hitbox' },
-  { type: 'action', key: 'costumes', label: 'COSTUMES' },
   { type: 'action', key: 'cutscenes', label: 'WATCH CUTSCENES' },
   { type: 'action', key: 'scoreboard', label: 'SCOREBOARD' },
   { type: 'action', key: 'entercode', label: 'ENTER SAVECODE' },
@@ -223,20 +224,7 @@ export function showMenu(world, opts = {}) {
     // 7+ rows (OUTER SPACE, SPEEDRUN MODE, LOAD GAME) close up to fit
     const gap = MENU_ITEMS.length > 8 ? 32 : MENU_ITEMS.length > 6 ? 36 : ITEM_GAP;
     diff.position.set(SCREEN_W / 2, ITEM_TOP + MENU_ITEMS.length * gap + 34);
-    // SPEEDRUN MODE has its own rules, shown in place of the difficulty
-    // picker while its row is selected.
-    let speedrunInfo = '';
-    Promise.all([timeLimit(), getRecord()]).then(([lim, rec]) => {
-      speedrunInfo = 'EASY  ·  1 LIFE  ·  LIMIT ' + formatTime(lim) + '  ·  RECORD ' + (rec == null ? '--:--' : formatTime(rec));
-      if (!diff.destroyed) showDiff();
-    });
     const showDiff = () => {
-      if (ROWS[idx] && ROWS[idx].key === 'speedrun') { diff.text = speedrunInfo; return; }
-      if (ROWS[idx] && ROWS[idx].key === 'endless') {   // ENDLESS MODE has fixed rules, no picker
-        const rec = getEndlessRecord();
-        diff.text = '3 HP  ·  1 LIFE  ·  BEST ROUND ' + (rec ? rec.round : '--');
-        return;
-      }
       diff.text = DIFFS.length < 2
         ? 'DIFFICULTY : ' + difficultyById(DIFFS[0]).name + (world.isMobile ? '  (MOBILE)' : '')
         : '◄  DIFFICULTY : ' + difficultyById(DIFFS[diffIdx]).name + '  ►';
@@ -311,13 +299,17 @@ export function showMenu(world, opts = {}) {
         return;
       }
       if (key === 'load') { loadGame(); return; }   // reloads into the save
+      if (key === 'costumes') { await showCostumes(world); resolve(await showMenu(world)); return; }
       if (key === 'options') { await showOptions(world); resolve(await showMenu(world)); return; }
       if (key === 'achievements') { await showAchievements(world); resolve(await showMenu(world)); return; }
       if (key === 'manual') { await showManual(world); resolve(await showMenu(world)); return; }
       // One merged run (outerspace.js's runOuterSpace).
       if (key === 'outerspace') { resolve(OUTER_SPACE); return; }
-      if (key === 'speedrun') { resolve(SPEEDRUN); return; }   // the timer starts with the run
-      if (key === 'endless') { resolve(ENDLESS); return; }
+      if (key === 'altmodes') {   // SPEEDRUN / ENDLESS, or back out to a fresh title
+        const mode = await showAltModes(world);
+        resolve(mode || await showMenu(world));
+        return;
+      }
       await showQuitScreen(world);
       resolve(await showMenu(world));
     };
@@ -328,15 +320,14 @@ export function showMenu(world, opts = {}) {
         return;
       }
       if (input.isDown('ctrl')) { input.endFrame(); return; }   // arrows are cheat input while Ctrl is held
-      const fixedRules = ROWS[idx] && (ROWS[idx].key === 'endless' || ROWS[idx].key === 'speedrun');
-      if (!fixedRules && DIFFS.length > 1 && input.wasPressed('left'))  { diffIdx = (diffIdx + DIFFS.length - 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
-      if (!fixedRules && DIFFS.length > 1 && input.wasPressed('right')) { diffIdx = (diffIdx + 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
+      if (DIFFS.length > 1 && input.wasPressed('left'))  { diffIdx = (diffIdx + DIFFS.length - 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
+      if (DIFFS.length > 1 && input.wasPressed('right')) { diffIdx = (diffIdx + 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
       if (input.wasPressed('up'))   { idx = (idx + MENU_ITEMS.length - 1) % MENU_ITEMS.length; place(); }
       if (input.wasPressed('down')) { idx = (idx + 1) % MENU_ITEMS.length; place(); }
       // a phone: tap a row to pick it; tap the difficulty line for the next difficulty
       const tapped = tapRow(items, gap);
       if (tapped >= 0) { idx = tapped; place(); select(idx); return; }
-      if (!fixedRules && DIFFS.length > 1 && tapOn(diff, 60)) { diffIdx = (diffIdx + 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
+      if (DIFFS.length > 1 && tapOn(diff, 60)) { diffIdx = (diffIdx + 1) % DIFFS.length; showDiff(); setDifficultyId(DIFFS[diffIdx]); }
       if (firePressed()) { select(idx); return; }
       input.endFrame();
     };
@@ -501,7 +492,6 @@ function showOptions(world) {
       if (r.type !== 'action') return;   // ←/→-only rows ignore fire
       close();
       if (r.key === 'scoreboard') { await showScoreboard(world); resolve(await showOptions(world)); return; }
-      if (r.key === 'costumes') { await showCostumes(world); resolve(await showOptions(world)); return; }
       if (r.key === 'cutscenes') { await showCutscenes(world); resolve(await showOptions(world)); return; }
       await handleEnterCode(world);
       resolve(await showOptions(world));
@@ -531,11 +521,11 @@ function showOptions(world) {
   });
 }
 
-// OPTIONS → COSTUMES: the player-ship reskins (costumes.js), per direct
+// COSTUMES (a title-menu row; it was OPTIONS → COSTUMES): the player-ship reskins (costumes.js), per direct
 // request ("in settings add 'Costumes' option... reskins, you unlock them
 // when completing levels"). A cursor list on the left, a big preview of the
 // highlighted costume's ship and its three shots on the right. Fire equips
-// an unlocked one; a locked one names the level that earns it. ESC backs out.
+// an unlocked one; a locked one names the level that earns it. X backs out.
 function costumePreview(id, locked) {
   const c = new PIXI.Container();
   const ship = id === 'default'
@@ -663,6 +653,79 @@ const CUTSCENES = [
   { key: 'intro', name: 'INTRO', play: w => playIntro(w), unlocked: () => true },
   { key: 'ending', name: 'ENDING', play: w => waitForSounds(w).then(() => playOutro(w)), unlocked: () => isCostumeUnlocked('delta') },
 ];
+
+// ALTERNATIVE GAME MODES: SPEEDRUN MODE and ENDLESS MODE under one title
+// row, per direct request ("merge endless mode and speedrun mode into
+// 'alternative game modes'"). Same cursor list as WATCH CUTSCENES; the line
+// under it shows the picked mode's rules (it was the title's difficulty
+// line). Resolves with the pseudo-level to play, or nothing on [X].
+const ALT_MODES = [
+  { name: 'SPEEDRUN MODE', level: () => SPEEDRUN },   // the timer starts with the run
+  { name: 'ENDLESS MODE', level: () => ENDLESS },
+];
+export function showAltModes(world) {
+  return new Promise(resolve => {
+    const layer = new PIXI.Container();
+    layer.zIndex = 200;
+    const title = new PIXI.Text('ALTERNATIVE GAME MODES', { ...SUB_STYLE, fontSize: 36, letterSpacing: 5 });
+    title.anchor.set(0.5);
+    title.position.set(SCREEN_W / 2, 160);
+
+    const top = 300, gap = 54;
+    const itemY = i => top + i * gap;
+    const items = ALT_MODES.map((m, i) => {
+      const t = new PIXI.Text(m.name, { ...SUB_STYLE, fontSize: 24, letterSpacing: 3 });
+      t.anchor.set(0.5);
+      t.position.set(SCREEN_W / 2, itemY(i));
+      return t;
+    });
+    const cursor = new PIXI.Text('>', { ...SUB_STYLE, fontSize: 24 });
+    cursor.anchor.set(0.5);
+    const info = new PIXI.Text('', { ...SUB_STYLE, fontSize: 20, letterSpacing: 3 });
+    info.anchor.set(0.5);
+    info.position.set(SCREEN_W / 2, itemY(ALT_MODES.length) + 24);
+    const hint = new PIXI.Text(world.isMobile ? 'TAP TO PLAY      X  BACK' : '↑ ↓  CHOOSE      Z / SPACE  PLAY      X  BACK', { ...SUB_STYLE, fontSize: 15 });
+    hint.anchor.set(0.5);
+    hint.position.set(SCREEN_W / 2, itemY(ALT_MODES.length) + 84);
+    hint.alpha = 0.7;
+    layer.addChild(title, cursor, info, hint, ...items);
+
+    // Each mode's own rules, as the title used to show them.
+    let speedrunInfo = '';
+    const endlessRec = getEndlessRecord();
+    const endlessInfo = '3 HP  ·  1 LIFE  ·  BEST ROUND ' + (endlessRec ? endlessRec.round : '--');
+    let idx = 0;
+    const place = () => {
+      items.forEach((t, i) => t.scale.set(i === idx ? 1.1 : 1));
+      cursor.position.set(SCREEN_W / 2 - items[idx].width / 2 - 24, itemY(idx));
+      info.text = idx === 0 ? speedrunInfo : endlessInfo;
+    };
+    Promise.all([timeLimit(), getRecord()]).then(([lim, rec]) => {
+      speedrunInfo = 'EASY  ·  1 LIFE  ·  LIMIT ' + formatTime(lim) + '  ·  RECORD ' + (rec == null ? '--:--' : formatTime(rec));
+      if (!info.destroyed) place();
+    });
+    place();
+    world.stage.addChild(layer);
+
+    const close = () => {
+      world.app.ticker.remove(step);
+      world.stage.removeChild(layer);
+      layer.destroy({ children: true });
+      input.endFrame();   // same leaked-edge reason as showOptions' own close()
+    };
+    const firePressed = input.armGuard('fire');
+    const step = () => {
+      if (input.wasPressed('up'))   { idx = (idx + ALT_MODES.length - 1) % ALT_MODES.length; world.audio.play('levelSelectPress', 0.5); place(); }
+      if (input.wasPressed('down')) { idx = (idx + 1) % ALT_MODES.length; world.audio.play('levelSelectPress', 0.5); place(); }
+      if (input.backPressed()) { close(); resolve(null); return; }
+      const tapped = tapRow(items, gap);   // a phone: tap one to play it
+      if (tapped >= 0) { idx = tapped; place(); }
+      if (firePressed() || tapped >= 0) { close(); resolve(ALT_MODES[idx].level()); return; }
+      input.endFrame();
+    };
+    world.app.ticker.add(step);
+  });
+}
 
 export function showCutscenes(world) {
   return new Promise(resolve => {
