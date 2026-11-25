@@ -1,0 +1,12 @@
+{
+  "name": "Knight",
+  "width": 48,
+  "height": 50,
+  "layers": [
+    { "type": "ellipse", "modes": "V", "fill": "cobalt", "cx": 24, "cy": 25, "rx": 24, "ry": 25 },
+    { "type": "polygon", "modes": "V", "fill": "grape",
+      "points": [10.38,45.32, 10.67,5.01, 47.13,25.34] },
+    { "type": "polygon", "modes": "V", "fill": "ring",
+      "points": [11.50,20.14, 35.75,19.87, 45.45,25.46, 34.90,30.86, 11.40,30.89] }
+  ]
+}

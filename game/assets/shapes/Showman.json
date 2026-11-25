@@ -1,0 +1,26 @@
+{
+  "name": "Showman",
+  "width": 160,
+  "height": 210,
+  "layers": [
+    { "type": "rect", "x": 55, "y": 0, "w": 50, "h": 44, "fill": "hull", "modes": "V" },
+    { "type": "rect", "x": 51, "y": 38, "w": 58, "h": 7, "fill": "hull", "modes": "V" },
+    { "type": "rect", "x": 18, "y": 45, "w": 124, "h": 14, "fill": "hull", "modes": "V" },
+    { "type": "ellipse", "cx": 80, "cy": 128, "rx": 58, "ry": 62, "fill": "hull", "modes": "V" },
+    { "type": "polygon", "modes": "V", "fill": "hull",
+      "points": [42,96, 68,90, 68,98, 42,104] },
+    { "type": "polygon", "modes": "V", "fill": "hull",
+      "points": [118,96, 92,90, 92,98, 118,104] },
+    { "type": "star", "cx": 58, "cy": 118, "rOuter": 15, "rInner": 6, "count": 4, "fill": "hull", "modes": "V" },
+    { "type": "star", "cx": 102, "cy": 118, "rOuter": 15, "rInner": 6, "count": 4, "fill": "hull", "modes": "V" },
+    { "type": "capsule", "x1": 52, "y1": 150, "x2": 78, "y2": 144, "r": 8, "fill": "hull", "modes": "V" },
+    { "type": "capsule", "x1": 108, "y1": 150, "x2": 82, "y2": 144, "r": 8, "fill": "hull", "modes": "V" },
+    { "type": "polygon", "modes": "V", "fill": "hull",
+      "points": [46,165, 114,165, 114,182, 102,192, 90,180, 78,192, 66,180, 54,192, 46,182] },
+    { "type": "polygon", "modes": "V", "fill": "hull",
+      "points": [60,196, 80,190, 80,203] },
+    { "type": "polygon", "modes": "V", "fill": "hull",
+      "points": [100,196, 80,190, 80,203] },
+    { "type": "ellipse", "cx": 80, "cy": 194, "rx": 5, "ry": 5, "fill": "hull", "modes": "V" }
+  ]
+}

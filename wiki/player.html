@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Player - A Game Before Time Wiki</title>
+<meta name="description" content="The player character of A Game Before Time: the little yellow ship, its controls, health, lives, saving and costumes.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;700;800&family=Chakra+Petch:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>:root { --c: #ffe400; }</style>
+</head>
+<body>
+<header><div class="wrap"><a href="../">&larr; A Game Before Time</a></div></header>
+<main class="wrap">
+  <div class="top">
+    <div>
+      <span class="kicker" style="display:block;padding-top:32px">Character &middot; Player</span>
+      <h1 style="padding-top:12px">The Player</h1>
+      <p style="margin-top:20px">You are a piece of the <b>Crystal of Spirit</b>. Its energy drifted for a while, absorbed a few healing orbs, and woke up as a little yellow ship. As the ambassador of all the crystals, it is your job to take them back.</p>
+    </div>
+    <aside class="infobox">
+      <img src="../media/04_shape_limbo_trap_circle.png" alt="The yellow player ship inside the Trap Circle">
+      <table>
+        <tr><th scope="row">Origin</th><td>Crystal of Spirit</td></tr>
+        <tr><th scope="row">Colour</th><td>Yellow</td></tr>
+        <tr><th scope="row">Normal difficulty</th><td>3 HP, 3 lives</td></tr>
+      </table>
+    </aside>
+  </div>
+
+  <h2>Appearance</h2>
+  <p>The player is a small yellow triangle with a smaller triangle outlined inside it, drawn in the same flat line-art style as the rest of the game. Yellow always means you. Your spare lives are shown as small yellow triangles next to your HP.</p>
+
+  <h2>Controls</h2>
+  <div class="infobox" style="margin-top:0">
+    <table>
+      <tr><th scope="row">Arrows / WASD</th><td>Move</td></tr>
+      <tr><th scope="row">Z / Space</th><td>Shoot</td></tr>
+      <tr><th scope="row">Hold Z / Space, let go</th><td>Charged shot</td></tr>
+      <tr><th scope="row">C (hold)</th><td>Keep facing one way</td></tr>
+      <tr><th scope="row">V</th><td>Switch weapon, once you have more</td></tr>
+      <tr><th scope="row">X</th><td>Pause / back</td></tr>
+      <tr><th scope="row">Shift</th><td>Save the game</td></tr>
+      <tr><th scope="row">Enter</th><td>Load your save</td></tr>
+    </table>
+  </div>
+
+  <h2>Health, lives and difficulty</h2>
+  <p>Pick the difficulty on the title screen with the left and right arrows.</p>
+  <ul>
+    <li><b>Easy:</b> 4 HP, 3 lives. Lives refill on a clear, and a heal orb drops for every 100 damage you deal.</li>
+    <li><b>Normal:</b> 3 HP, 3 lives.</li>
+    <li><b>Hard:</b> 2 HP, 2 lives. Unlocked by beating the game.</li>
+  </ul>
+  <p>When you run out of lives, Give Up starts a new run, and your cleared stages stay.</p>
+
+  <h2>Health orbs and score</h2>
+  <p><b style="color:#00ff52">Green</b> orbs heal 1 HP. Touch them, don't shoot them. The minus on an orb is an electron (see <a href="crystals.html">Crystals</a>). Orbs appear between phases and fade after about 12 seconds, and each one is worth 1 point.</p>
+  <p>You score for what you destroy. Purple and pink things can't be destroyed, so they give no points. Your total carries from stage to stage, and at one million it reads "M".</p>
+
+  <h2>Saving</h2>
+  <ul>
+    <li>Press <b>Shift</b> any time in a stage to save, and <b>Enter</b> to go back to your save. Load Game on the title screen does the same. The save stays after you close the game.</li>
+    <li>Without a save, a new tab starts from zero.</li>
+    <li>Every stage clear and game over shows a code. In Options, Enter Savecode gives your score and cleared stages back.</li>
+    <li>Beating the game saves by itself.</li>
+  </ul>
+
+  <h2>Costumes</h2>
+  <p>On the title screen, Costumes: clear a stage to earn its ship. Each one has a passive, an upside and a downside.</p>
+  <div class="infobox" style="margin-top:0">
+    <table>
+      <tr><th scope="row">Classic</th><td>The stock ship. No passive: no trade-offs, the safe pick.</td></tr>
+      <tr><th scope="row">Firework<br><span style="font-weight:400">Crazy Carnival</span></th><td>Moves 20% faster, and a full charge also bursts 6 pellets around you. Purple hits you for +1.</td></tr>
+      <tr><th scope="row">Dragon<br><span style="font-weight:400">Occültacresburg</span></th><td>Hold fire to rapid fire while the charge builds, and it charges 1.4x faster. 1 less max HP.</td></tr>
+      <tr><th scope="row">The OG<br><span style="font-weight:400">Shape Limbo</span></th><td>While charging, nearby heal orbs glide to you. Always moves 25% slower.</td></tr>
+      <tr><th scope="row">Devil Fish<br><span style="font-weight:400">Cyber Zoo</span></th><td>3 shots in a row that hit earn a free charge: your next let-go fires fully charged. A miss resets the count. One life less.</td></tr>
+      <tr><th scope="row"><a href="delta.html">Delta</a><br><span style="font-weight:400">Beat the game</span></th><td>No passive. No colours, backwards sound and a mirrored screen: a challenge, not a boost.</td></tr>
+    </table>
+  </div>
+</main>
+<footer><div class="wrap">A Game Before Time wiki &middot; <a href="index.html">Wiki index</a> &middot; <a href="../">Back to the main site</a></div></footer>
+</body>
+</html>

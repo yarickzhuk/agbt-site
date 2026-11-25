@@ -1,0 +1,11 @@
+{
+  "name": "Pirania",
+  "width": 120,
+  "height": 70,
+  "layers": [
+    { "type": "polygon", "fill": "core", "points": [30, 35, 4, 9, 14, 35, 4, 61] },
+    { "type": "ellipse", "cx": 62, "cy": 35, "rx": 34, "ry": 22, "fill": "core" },
+    { "type": "ellipse", "cx": 82, "cy": 27, "rx": 4, "ry": 4, "fill": "core" },
+    { "type": "polygon", "fill": "core", "points": [96, 30, 101, 34, 105, 30, 110, 34, 114, 30] }
+  ]
+}
