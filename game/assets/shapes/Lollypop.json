@@ -1,0 +1,13 @@
+{
+  "name": "Lollypop",
+  "width": 88,
+  "height": 148,
+  "layers": [
+    { "type": "ellipse", "cx": 44, "cy": 44, "rx": 44, "ry": 43.5, "fill": "ring", "modes": "V" },
+    { "type": "ellipse", "cx": 44, "cy": 44, "rx": 30, "ry": 30, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 30, "y1": 34, "x2": 44, "y2": 44, "r": 1.2, "fill": "ring", "modes": "V" },
+    { "type": "capsule", "x1": 44, "y1": 44, "x2": 58, "y2": 54, "r": 1.2, "fill": "ring", "modes": "V" },
+    { "type": "capsule", "x1": 58, "y1": 54, "x2": 50, "y2": 66, "r": 1.2, "fill": "ring", "modes": "V" },
+    { "type": "capsule", "x1": 40.5, "y1": 87, "x2": 40.5, "y2": 147, "r": 2.2, "fill": "ring", "modes": "V" }
+  ]
+}

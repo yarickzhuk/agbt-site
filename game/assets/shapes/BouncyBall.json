@@ -1,0 +1,9 @@
+{
+  "name": "BouncyBall",
+  "width": 14,
+  "height": 14,
+  "layers": [
+    { "type": "ellipse", "cx": 7, "cy": 7, "rx": 7, "ry": 7, "fill": "amber", "modes": "V" },
+    { "type": "ellipse", "cx": 7, "cy": 7, "rx": 3, "ry": 3, "fill": "hull", "modes": "V" }
+  ]
+}

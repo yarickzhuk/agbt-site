@@ -1,0 +1,28 @@
+{
+  "name": "PlayerMove",
+  "width": 60,
+  "height": 25,
+  "layers": [
+    { "type": "polygon", "points": [13,7, 26,3, 26,22, 13,18], "fill": "hull", "modes": "8" },
+    { "type": "polygon", "points": [4,10, 13,7, 13,18, 4,15], "fill": "hullDark", "modes": "8" },
+
+    { "type": "polygon", "points": [17,5, 26,3, 26,22, 17,20], "fill": "hullMid", "modes": "16" },
+    { "type": "polygon", "points": [9,8, 17,5.5, 17,19.5, 9,17], "fill": "hull", "modes": "16" },
+    { "type": "polygon", "points": [2,11, 9,8.5, 9,16.5, 2,14], "fill": "hullDark", "modes": "16" },
+
+    { "type": "polygon", "points": [0,12.5, 26,3, 26,22], "fill": "hull", "modes": "32",
+      "gradientTo": "transparent", "gradientDir": "-x" },
+    { "type": "polygon", "points": [7,12.5, 26,7, 26,18], "fill": "hullLight", "modes": "32",
+      "gradientTo": "transparent", "gradientDir": "-x" },
+
+    { "type": "polygon", "points": [25,1, 59,12, 25,24], "fill": "hull", "modes": "8,16" },
+    { "type": "polygon", "points": [25,1, 59,12, 25,24], "fill": "hull", "modes": "32",
+      "gradientTo": "hullMid", "gradientDir": "x" },
+    { "type": "polygon", "points": [30,6, 45,12, 30,18], "fill": "hull", "erase": true, "modes": "8,16,32" },
+    { "type": "polygon", "points": [25,21, 50,15, 25,24], "fill": "hullDark", "clip": true, "modes": "16,32" },
+
+    { "type": "polygon", "points": [25,1, 59,12, 25,24], "fill": "hull", "modes": "V" },
+    { "type": "polygon", "points": [30,6, 45,12, 30,18], "fill": "hull", "modes": "V" },
+    { "type": "polygon", "points": [2,12.5, 22,6, 22,19], "fill": "hullLight", "modes": "V" }
+  ]
+}

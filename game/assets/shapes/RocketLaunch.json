@@ -1,0 +1,15 @@
+{
+  "name": "RocketLaunch",
+  "width": 36,
+  "height": 80,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "grape",
+      "points": [3,18, 19.5,2, 36,19, 19.7,18.3] },
+    { "type": "rect", "x": 6, "y": 19, "w": 28, "h": 31, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 23.1, "y1": 19.4, "x2": 7.3, "y2": 33.4, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 33.3, "y1": 23.4, "x2": 6.8, "y2": 48.9, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 33.6, "y1": 38.2, "x2": 20.8, "y2": 49.4, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "polygon", "modes": "V", "fill": "ringLight",
+      "points": [33.57,52.33, 29.03,63.22, 22.17,56.04, 17.14,64.16, 12.68,56.29, 8.55,63.94, 6.31,52.13] }
+  ]
+}

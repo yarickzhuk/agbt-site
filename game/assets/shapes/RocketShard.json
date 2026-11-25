@@ -1,0 +1,9 @@
+{
+  "name": "RocketShard",
+  "width": 32,
+  "height": 24,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "grape",
+      "points": [2.6,10.5, 21.7,1.5, 31.3,11.5, 21.4,22] }
+  ]
+}

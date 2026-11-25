@@ -1,0 +1,130 @@
+// levels/shapelimbo.js — "SHAPE LIMBO": the tutorial. A calm void that teaches
+// the four things the game asks of you, one at a time, before CYBER ZOO throws
+// hazards at you for real:
+//
+//   1. MOVE            — fly around
+//   2. SHOOT (cyan)    — cyan dies to any shot
+//   3. TORPEDO (blue)  — dark blue only dies to a charged torpedo (hold fire)
+//   4. DODGE (purple)  — purple can't be shot; survive a short meteor burst
+//
+// Self-contained like every level: it composes the shared primitives and a tiny
+// local "target" helper, and resolves when done (win = player alive).
+import { input } from '../input.js';
+import { Hittable, CYAN, DARKBLUE, toScreen, HALF_H, SCREEN_W, SCREEN_H } from '../core.js';
+import { buildSprite } from '../retro.js';
+import { spawnMeteorBatch } from '../meteor.js';
+
+const TINT = { [CYAN]: 0x00E6FF, [DARKBLUE]: 0x3355FF };
+
+// A stationary practice target. Not a real hazard: it can't hurt the player and
+// scores nothing — it just sits there waiting to be shot. `dead` flips true once
+// destroyed (poll it to know the lesson is done).
+function spawnTarget(world, x, y, color) {
+  const t = new Hittable(world, {
+    x, y, color, radius: 0.45, hurtsPlayer: false, countsAsProgress: false,
+  });
+  const sprite = buildSprite('LaserBlock', { scale: 3.5, lineWidth: 2, tint: TINT[color] });
+  const [sx, sy] = toScreen(x, y);
+  sprite.position.set(sx, sy);
+  sprite.zIndex = 5;
+  world.stage.addChild(sprite);
+  t.onDie = () => {
+    if (!sprite.destroyed) sprite.destroy({ children: true });
+    const i = world.hittables.indexOf(t);
+    if (i >= 0) world.hittables.splice(i, 1);
+  };
+  return t;
+}
+
+const anyKeyDown = () => ['left', 'right', 'up', 'down', 'fire', 'lock'].some(k => input.isDown(k));
+
+// Fly the player in and hold on the title until a key is pressed.
+function intro(world, hud) {
+  return new Promise(resolve => {
+    const p = world.player;
+    p.frozen = true;
+    p.x = 0; p.facing = { x: 0, y: -1 };
+    const startY = HALF_H + 1.5, endY = 2.5, flyDur = 1.2;
+    p.y = startY; p.render();
+    hud.setPhaseText('');
+
+    const layer = new PIXI.Container();
+    layer.zIndex = 150;
+    const mk = (s, size, y) => {
+      const t = new PIXI.Text(s, { fontFamily: 'Tektur, monospace', fontSize: size, fill: 0xffffff, letterSpacing: 4, align: 'center' });
+      t.anchor.set(0.5); t.position.set(SCREEN_W / 2, y); t.visible = false; layer.addChild(t); return t;
+    };
+    const title = mk('TUTORIAL', 60, SCREEN_H / 2 - 40);
+    const prompt = mk('PRESS ANY KEY', 24, SCREEN_H / 2 + 34);
+    world.stage.addChild(layer);
+
+    let t = 0, armed = false;
+    const step = () => {
+      t += Math.min(world.app.ticker.deltaMS / 1000, 0.05);
+      const k = Math.min(1, t / flyDur);
+      const e = 1 - Math.pow(1 - k, 3);
+      p.y = startY + (endY - startY) * e; p.render();
+      if (k >= 1) {
+        title.visible = true; prompt.visible = true;
+        prompt.alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 5));
+        if (!armed && !anyKeyDown()) armed = true;
+        if ((armed && anyKeyDown()) || p.dead) {
+          world.app.ticker.remove(step);
+          world.stage.removeChild(layer); layer.destroy({ children: true });
+          p.facing = { x: 1, y: 0 }; p.frozen = false;
+          resolve();
+        }
+      }
+    };
+    world.app.ticker.add(step);
+  });
+}
+
+export async function run(world, hud) {
+  const p = world.player;
+  await intro(world, hud);
+  if (p.dead) return;
+
+  // 1. MOVE — wait until the player actually flies somewhere.
+  hud.setCenter('MOVE\nARROWS / WASD');
+  const sx = p.x, sy = p.y;
+  await world.waitUntil(() => p.dead || Math.hypot(p.x - sx, p.y - sy) > 1.8);
+  if (p.dead) return;
+  hud.setCenter(''); await world.wait(0.4);
+
+  // 2. SHOOT — cyan dies to any shot.
+  hud.setCenter('CYAN DIES TO ANY SHOT\nZ / SPACE  FIRE');
+  const cyan = [spawnTarget(world, -2.4, -1.2, CYAN), spawnTarget(world, 0, -1.6, CYAN), spawnTarget(world, 2.4, -1.2, CYAN)];
+  await world.waitUntil(() => p.dead || cyan.every(t => t.dead));
+  if (p.dead) return;
+  hud.setCenter(''); await world.wait(0.4);
+
+  // 3. TORPEDO / PIERCE — dark blue only dies to a piercing shot. The standard
+  // gun needs a held charge; the Cyber Shotgun pierces it on every tap.
+  const piercer = world.weapon && world.weapon.spread;
+  hud.setCenter(piercer
+    ? 'DARK BLUE — YOUR SHOTGUN PIERCES IT\nZ / SPACE  FIRE'
+    : 'DARK BLUE NEEDS A CHARGED TORPEDO\nHOLD  Z / SPACE  TO CHARGE');
+  const blue = [spawnTarget(world, -1.6, -1.2, DARKBLUE), spawnTarget(world, 1.6, -1.2, DARKBLUE)];
+  await world.waitUntil(() => p.dead || blue.every(t => t.dead));
+  if (p.dead) return;
+  hud.setCenter(''); await world.wait(0.4);
+
+  // 4. DODGE — purple can't be shot; survive a short meteor burst.
+  hud.setCenter("PURPLE CAN'T BE DESTROYED\nDODGE!");
+  await world.wait(1.4);
+  hud.setCenter('');
+  let next = 0;
+  await world.runFor(10, (t, left) => {
+    if (t >= next) { spawnMeteorBatch(world, 2); next += 2.2; }
+    hud.setPhaseText('DODGE   ' + Math.ceil(left));
+  });
+  if (p.dead) return;
+  hud.setPhaseText('');
+  world.clearEntities();
+
+  hud.setCenter('TUTORIAL COMPLETE');
+  await world.wait(1.8);
+  hud.setCenter('');
+  // level clear is handled by main.js (marks progress + shows the screen)
+}

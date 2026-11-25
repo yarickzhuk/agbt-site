@@ -1,0 +1,16 @@
+{
+  "name": "BombExplosion",
+  "width": 96,
+  "height": 96,
+  "layers": [
+    { "type": "star", "cx": 48, "cy": 48, "rOuter": 46, "rInner": 31, "count": 8, "rotation": 0,
+      "fill": "core", "modes": "8" },
+    { "type": "star", "cx": 48, "cy": 48, "rOuter": 46, "rInner": 30, "count": 12, "rotation": 12,
+      "fill": "core", "modes": "16,32", "gradientTo": "coreLight", "gradientDir": "radial" },
+    { "type": "star", "cx": 48, "cy": 48, "rOuter": 34, "rInner": 22, "count": 12, "rotation": 27,
+      "fill": "coreDark", "modes": "32" },
+    { "type": "ellipse", "cx": 48, "cy": 48, "rx": 13, "ry": 13, "fill": "white", "modes": "8,16,32" },
+    { "type": "ellipse", "cx": 48, "cy": 48, "rx": 20, "ry": 20, "fill": "coreLight", "modes": "32",
+      "gradientTo": "transparent", "gradientDir": "radial" }
+  ]
+}
