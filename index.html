@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>A Game Before Time</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Delta shattered the Crystal in one big bang. Take it back, one boss at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;700;800&family=Chakra+Petch:wght@400;600&display=swap">
+<style>
+/* Layout: one black arcade screen, read top to bottom. Section headings are
+   outlined like the game's text; the eight aspect colours are the only accents. */
+:root {
+  color-scheme: dark;
+  --bg: #000;          /* the game's own black */
+  --panel: #0c0b12;    /* a hair of violet, for framed media */
+  --line: #2a2738;     /* hairlines */
+  --fg: #e9e7f2;       /* body text */
+  --dim: #9a96ad;      /* captions */
+  --cyan: #00e6ff;     /* the title face, CONTROL */
+  --purple: #b300ff;   /* the title's depth, MATTER */
+  --yellow: #ffe400;   /* the player, SPIRIT */
+  --red: #ff1a1a; --orange: #ffa000; --green: #00ff52; --blue: #2b00ff; --pink: #ff00d4;
+  --display: 'Tektur', 'Chakra Petch', ui-monospace, monospace;
+  --body: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 1.05rem/1.6 var(--body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+section { padding-block: clamp(48px, 8vw, 96px); border-top: 1px solid var(--line); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: .06em; }
+/* outlined, like every word in the game */
+h2 { font-size: clamp(1.9rem, 4.6vw, 3rem); font-weight: 800; color: transparent; -webkit-text-stroke: 1.4px var(--cyan); text-transform: uppercase; }
+h2 .depth { position: relative; display: inline-block; }
+h3 { font-size: 1.15rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+p { margin: 0; max-width: 65ch; }
+a { color: var(--yellow); text-underline-offset: 3px; }
+a:focus-visible, video:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+.kicker { font: 600 .78rem/1 var(--display); letter-spacing: .22em; text-transform: uppercase; color: var(--dim); }
+.stack { display: grid; gap: 20px; }
+.head { display: grid; gap: 14px; margin-bottom: 36px; }
+
+/* hero */
+.hero { padding-block: clamp(24px, 5vw, 56px) clamp(40px, 7vw, 72px); text-align: center; }
+.hero video, .hero img { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; }
+.tagline { font: 700 clamp(1.05rem, 2.4vw, 1.4rem)/1.4 var(--display); letter-spacing: .04em; margin: 8px auto 18px; max-width: 34ch; text-wrap: balance; }
+.facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.facts li { font: 600 .82rem/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--fg); border: 1px solid var(--line); padding: 9px 12px; }
+.facts li b { color: var(--yellow); font-weight: 600; }
+
+/* play: the game itself, in a frame */
+.player { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border: 1px solid var(--line); }
+.player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.player .poster { position: absolute; inset: 0; display: grid; place-items: center; background: #000 center / contain no-repeat url(media/title_logo_still.png); }
+.player .poster { container-type: size; }
+.play-btn { position: absolute; left: 50%; top: 79%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1.6cqh; background: none; border: 0; padding: 2cqh 3cqw; cursor: pointer; color: var(--cyan); }
+.play-btn svg { width: 17cqw; height: auto; overflow: visible; }
+.play-btn svg polygon { fill: none; stroke-width: 5; stroke-linejoin: miter; }
+.play-btn .depth polygon { stroke: var(--purple); }
+.play-btn .face polygon { stroke: var(--cyan); fill: rgba(0,0,0,.9); transition: fill .15s; }
+.play-btn .depth { transform: translate(6px, 6px); transition: transform .15s; }
+.play-btn .cap { font: 800 max(10px, 2.3cqw)/1 var(--display); letter-spacing: .35em; padding-left: .35em; color: transparent; -webkit-text-stroke: 1.2px var(--cyan); }
+.play-btn:hover .face polygon { fill: rgba(0,230,255,.18); }
+.play-btn:hover .depth { transform: translate(14px, 6px); }
+.play-btn:hover .cap { -webkit-text-stroke-color: var(--yellow); }
+.play-btn:focus-visible, .play-bar button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+.play-bar { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; align-items: center; margin-top: 12px; color: var(--dim); font-size: .9rem; }
+.play-bar kbd { font: 600 .8rem/1 var(--display); color: var(--fg); border: 1px solid var(--line); padding: 3px 6px; }
+.play-bar button { font: 600 .78rem/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--fg); background: none; border: 1px solid var(--line); padding: 9px 12px; cursor: pointer; }
+
+/* story */
+.story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 56px); align-items: start; }
+.story .lead { font: 700 clamp(1.4rem, 3vw, 2rem)/1.25 var(--display); letter-spacing: .03em; }
+.story .stack p:first-child::first-letter { color: var(--yellow); }
+
+/* the eight aspects: the game's own colour chart */
+.aspects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(20px, 4vw, 48px); }
+.half h3 { padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; color: var(--dim); }
+.aspect { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.aspect svg { width: 34px; height: 46px; }
+.aspect .name { font: 700 1rem/1.2 var(--display); letter-spacing: .12em; text-transform: uppercase; }
+.aspect .what { color: var(--dim); font-size: .95rem; line-height: 1.4; }
+
+/* stages */
+.stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.stage { display: grid; gap: 12px; min-width: 0; }
+.shot { width: 100%; max-width: 100%; aspect-ratio: 9 / 7; object-fit: cover; display: block; border: 1px solid var(--line); background: var(--panel); }
+.stage .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
+.stage .meta span { font: 600 .74rem/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.final { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+
+/* weapons + modes */
+.list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 40px; }
+.item { display: grid; gap: 6px; min-width: 0; border-left: 2px solid var(--c, var(--cyan)); padding-left: 16px; }
+.item p { color: var(--dim); }
+
+/* moments */
+.gifs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.gifs figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+.gifs figcaption { font-size: .9rem; color: var(--dim); }
+.gifs img { width: 100%; max-width: 100%; display: block; border: 1px solid var(--line); background: var(--panel); }
+.gifs .wide { grid-column: span 2; }
+
+/* press */
+.press { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 56px); align-items: start; }
+.sheet { width: 100%; border-collapse: collapse; font-size: .97rem; }
+.sheet th, .sheet td { text-align: left; padding: 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sheet th { font: 600 .74rem/1.4 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); width: 38%; padding-right: 14px; }
+.credits { display: grid; gap: 10px; }
+.credits .who { font: 700 1.05rem/1.3 var(--display); letter-spacing: .06em; }
+.credits .role { color: var(--dim); font-size: .9rem; }
+footer { border-top: 1px solid var(--line); padding-block: 28px 84px; color: var(--dim); font-size: .9rem; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; }
+
+/* soundtrack */
+.tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(20px, 4vw, 48px); padding: 0; margin: 0; list-style: none; }
+.track { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.track button, .sound-toggle { font: 700 .8rem/1 var(--display); letter-spacing: .14em; text-transform: uppercase; background: none; color: var(--c, var(--cyan)); border: 1.5px solid currentColor; cursor: pointer; }
+.track button { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; }
+.track button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+.track button[aria-pressed="true"] { background: var(--c, var(--cyan)); color: var(--bg); }
+.track .name { font: 700 1rem/1.2 var(--display); letter-spacing: .1em; text-transform: uppercase; }
+.track .where { color: var(--dim); font-size: .9rem; line-height: 1.3; }
+.track .len { font: 600 .78rem/1 var(--display); letter-spacing: .12em; color: var(--dim); }
+.track button:focus-visible, .sound-toggle:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+.sound-toggle { --c: var(--dim); position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 16px; z-index: 5; background: var(--bg); padding: 11px 14px; }
+.sound-toggle[aria-pressed="true"] { --c: var(--yellow); }
+
+@media (max-width: 760px) {
+  .story, .aspects, .stages, .final, .list, .press, .tracks { grid-template-columns: minmax(0, 1fr); }
+  .gifs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gifs .wide { grid-column: 1 / -1; }
+}
+@media (max-width: 440px) { .gifs { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .hero video { display: none; } .hero .still { display: block !important; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <video src="media/title_logo_1080p.mp4" poster="media/title_logo_still.png" autoplay muted playsinline preload="auto" aria-label="The A Game Before Time title logo forming out of particles"></video>
+    <img class="still" src="media/title_logo_still.png" alt="A Game Before Time" style="display:none">
+    <p class="tagline">Delta shattered the Crystal in one big bang. Take it back, one boss at a time.</p>
+    <ul class="facts" aria-label="At a glance">
+      <li><b>Free</b></li>
+      <li>In your browser</li>
+      <li>PC and mobile</li>
+      <li>Single player</li>
+      <li>8 bosses</li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <section id="play">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">Free, right here</span>
+        <h2>Play</h2>
+      </div>
+      <div class="player" id="player">
+        <div class="poster"><button type="button" class="play-btn" id="play-btn" aria-label="Play the game">
+          <svg viewBox="0 0 120 64" aria-hidden="true">
+            <g class="depth"><polygon points="58,4 6,32 58,60"/><polygon points="114,4 62,32 114,60"/></g>
+            <g class="face"><polygon points="58,4 6,32 58,60"/><polygon points="114,4 62,32 114,60"/></g>
+          </svg>
+          <span class="cap" aria-hidden="true">PLAY</span>
+        </button></div>
+      </div>
+      <div class="play-bar">
+        <span><kbd>ARROWS</kbd> / <kbd>WASD</kbd> move &nbsp; <kbd>Z</kbd> / <kbd>SPACE</kbd> fire, hold to charge &nbsp; <kbd>C</kbd> lock aim &nbsp; <kbd>V</kbd> weapon &nbsp; <kbd>X</kbd> pause</span>
+        <button type="button" id="fs-btn" hidden>Full screen</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="story">
+    <div class="wrap story">
+      <div class="stack">
+        <span class="kicker">The story</span>
+        <p class="lead">At first, there was nothing.</p>
+      </div>
+      <div class="stack">
+        <p>Then the White Universal Crystal formed, made of eight aspects: Speed, Creativity, Spirit, Life, Control, Resistance, Matter and Power. A thousand years later, a character called Delta got bored of living in monochrome. He struck the crystal and broke it apart.</p>
+        <p>You are what came out of it: a piece of the Crystal of Spirit that absorbed a few healing orbs and woke up as a little yellow ship. Now it's your job to take the crystals back.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="aspects">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">Colour is the rulebook</span>
+        <h2>The eight aspects</h2>
+        <p>Every colour in the game means something. The four warm aspects are your weapons and your health. The four cool ones Delta took, and they tell you how to fight anything you meet.</p>
+      </div>
+      <div class="aspects">
+        <div class="half">
+          <h3>Warm colours: yours</h3>
+          <div class="aspect" style="--c:var(--red)"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--red)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:var(--red)">Speed</div><div class="what">The melee weapon, LINE SLASHER.</div></div></div>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--orange)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:var(--orange)">Creativity</div><div class="what">Bounces off things: BOUNCY BALL.</div></div></div>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--yellow)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:var(--yellow)">Spirit</div><div class="what">You, your ship and your shots.</div></div></div>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--green)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:var(--green)">Life</div><div class="what">Heals you. Every healing orb.</div></div></div>
+        </div>
+        <div class="half">
+          <h3>Cool colours: Delta's</h3>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--cyan)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:var(--cyan)">Control</div><div class="what">Breaks to any shot.</div></div></div>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="#5a3dff" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:#7a63ff">Resistance</div><div class="what">Only a charged shot breaks it.</div></div></div>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--purple)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:#c54dff">Matter</div><div class="what">Never breaks. Don't touch it.</div></div></div>
+          <div class="aspect"><svg viewBox="-1 -1 24 44.4" aria-hidden="true" fill="none" stroke="var(--pink)" stroke-width="1.3" stroke-linejoin="miter"><polygon points="11.2,41.37 0.25,28.34 0.44,13.61 10.45,0.39 21.78,13.04 21.59,30.98 12.9,42.13"/><polygon points="11.5,33.29 5.66,26.35 5.77,18.51 11.09,11.47 17.13,18.21 17.03,27.76 12.4,33.69"/></svg><div><div class="name" style="color:var(--pink)">Power</div><div class="what">Hits you twice as hard.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stages">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">Four stages, any order</span>
+        <h2>Where the crystals went</h2>
+        <p>Every stage is one screen and a string of attack phases, and every one ends in a boss. Each teaches you its weapon and gives it to you for good.</p>
+      </div>
+      <div class="stages">
+        <article class="stage">
+          <img class="shot" src="media/04_shape_limbo_trap_circle.png" alt="SHAPE LIMBO: a torpedo flying at the Trap Circle" loading="lazy">
+          <div class="meta"><h3 style="color:var(--green)">Shape Limbo</h3><span>Charge Cannon</span><span>Boss: Trap Circle</span></div>
+        </article>
+        <article class="stage">
+          <img class="shot" src="media/01_cyber_zoo_beam.png" alt="CYBER ZOO: the beam cannon sweeping the screen, with piranhas" loading="lazy">
+          <div class="meta"><h3 style="color:var(--yellow)">Cyber Zoo</h3><span>Cyber Shotgun</span><span>Boss: Kangunroo</span></div>
+        </article>
+        <article class="stage">
+          <img class="shot" src="media/06_crazy_carnival_clownhouse.png" alt="CRAZY CARNIVAL: the Cruel Clownhouse maze" loading="lazy">
+          <div class="meta"><h3 style="color:var(--orange)">Crazy Carnival</h3><span>Bouncy Ball</span><span>Boss: Cruel Clownhouse</span></div>
+        </article>
+        <article class="stage">
+          <img class="shot" src="media/02_occultacresburg_plasmadrache.png" alt="OCCÜLTACRESBURG: Plasmadrache spitting flames" loading="lazy">
+          <div class="meta"><h3 style="color:var(--red)">Occültacresburg</h3><span>Line Slasher</span><span>Boss: Plasmadrache</span></div>
+        </article>
+        <article class="stage final">
+          <img class="shot" src="media/03_outer_space_delta_unit.png" alt="OUTER SPACE: the Delta Unit fleet, the ship inside a Bomb Shield" loading="lazy">
+          <div class="stack">
+            <h3 style="color:var(--cyan)">Outer Space</h3>
+            <p>Once all four weapons are yours, the final run opens: three stages, a boss rush of buffed old enemies, and THE FINALE.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="weapons">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">Tap to shoot, hold to charge</span>
+        <h2>Four weapons</h2>
+      </div>
+      <div class="list">
+        <div class="item" style="--c:var(--yellow)"><h3>Charge Cannon</h3><p>Tap for shots, hold for torpedoes, hold longer for a supercharge.</p></div>
+        <div class="item" style="--c:var(--yellow)"><h3>Cyber Shotgun</h3><p>A close-range blast that charges into an orbiting Bomb Shield you can throw.</p></div>
+        <div class="item" style="--c:var(--orange)"><h3>Bouncy Ball</h3><p>Shots that ricochet off everything.</p></div>
+        <div class="item" style="--c:var(--red)"><h3>Line Slasher</h3><p>A melee slash, and a dash that cuts through anything in its way.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="modes">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">No checkpoints, real lives</span>
+        <h2>After the credits</h2>
+      </div>
+      <div class="list">
+        <div class="item"><h3>Alternative game modes</h3><p>Endless: random attacks and a boss every round, until you fall. Speedrun: the whole game in 35 minutes, one life, against your own record.</p></div>
+        <div class="item"><h3>5 ship costumes</h3><p>Each with its own passive ability, and a downside to match.</p></div>
+        <div class="item"><h3>35 achievements</h3><p>From your first clear to the full tryhard ones.</p></div>
+        <div class="item" style="--c:var(--pink)"><h3>Toxic Mode (12+)</h3><p>Turn it on and the game roasts you out loud, with a different voice line for every way you can die.</p></div>
+        <div class="item"><h3>Hitbox on death</h3><p>The game freezes and shows exactly what hit you.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="moments">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">From the game</span>
+        <h2>Moments</h2>
+      </div>
+      <div class="gifs">
+        <figure class="wide"><img src="media/outer_space_delta_unit_shield.gif" alt="The Bomb Shield orbiting the ship against the Delta Unit" loading="lazy"><figcaption>The Bomb Shield against the Delta Unit.</figcaption></figure>
+        <figure><img src="media/occultacresburg_line_slasher.gif" alt="The Line Slasher's dash" loading="lazy"><figcaption>The Line Slasher dash.</figcaption></figure>
+        <figure><img src="media/meme_gg_ez_chomp.gif" alt="Plasmadrache chomping the player: GG EZ" loading="lazy"><figcaption>Never hit Plasmadrache while his mouth is open.</figcaption></figure>
+        <figure><img src="media/meme_kangunroo_delta_wall_jumps.gif" alt="Kangunroo Delta wall-jumping on every side of the screen" loading="lazy"><figcaption>Kangunroo Delta uses all four walls.</figcaption></figure>
+        <figure><img src="media/meme_y_u_do_this.gif" alt="The Y u do this? Game Over screen on a phone held upright" loading="lazy"><figcaption>Don't play it on a phone held upright.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="soundtrack">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">Straight from the game</span>
+        <h2>Soundtrack</h2>
+        <p>All music by Oxygen. Every track loops, the way it does in a fight. Press one to play it, press again to stop.</p>
+      </div>
+      <ul class="tracks">
+        <li class="track" style="--c:var(--yellow)"><button type="button" data-src="media/sounds/stage_select.mp3" aria-pressed="false" aria-label="Play Stage Select"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Stage Select</div><div class="where">The hub</div></div><span class="len">0:16</span></li>
+        <li class="track" style="--c:var(--green)"><button type="button" data-src="media/sounds/trap_circle.mp3" aria-pressed="false" aria-label="Play Trap Circle"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Trap Circle</div><div class="where">Shape Limbo's boss</div></div><span class="len">0:16</span></li>
+        <li class="track" style="--c:var(--cyan)"><button type="button" data-src="media/sounds/kangunroo.mp3" aria-pressed="false" aria-label="Play Kangunroo Delta"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Kangunroo Delta</div><div class="where">Boss rush</div></div><span class="len">0:12</span></li>
+        <li class="track" style="--c:var(--orange)"><button type="button" data-src="media/sounds/cruel_clownhouse.mp3" aria-pressed="false" aria-label="Play Cruel Clownhouse"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Cruel Clownhouse</div><div class="where">Crazy Carnival's maze</div></div><span class="len">0:23</span></li>
+        <li class="track" style="--c:var(--orange)"><button type="button" data-src="media/sounds/showman.mp3" aria-pressed="false" aria-label="Play Showman"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Showman</div><div class="where">Crazy Carnival's boss</div></div><span class="len">0:14</span></li>
+        <li class="track" style="--c:var(--red)"><button type="button" data-src="media/sounds/plasmadrache.mp3" aria-pressed="false" aria-label="Play Plasmadrache"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Plasmadrache</div><div class="where">Occültacresburg's boss</div></div><span class="len">0:19</span></li>
+        <li class="track" style="--c:var(--purple)"><button type="button" data-src="media/sounds/mothership_attacks.mp3" aria-pressed="false" aria-label="Play Mothership Attacks"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Mothership Attacks</div><div class="where">The Finale</div></div><span class="len">0:54</span></li>
+        <li class="track" style="--c:var(--cyan)"><button type="button" data-src="media/sounds/finale_tesseract.mp3" aria-pressed="false" aria-label="Play Tesseract"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">Tesseract</div><div class="where">The Finale</div></div><span class="len">0:16</span></li>
+        <li class="track" style="--c:var(--pink)"><button type="button" data-src="media/sounds/vs_delta.mp3" aria-pressed="false" aria-label="Play vs Delta"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg></button><div><div class="name">vs Delta</div><div class="where">The final boss</div></div><span class="len">2:00</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="press">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker">Press and streamers</span>
+        <h2>Fact sheet</h2>
+      </div>
+      <div class="press">
+        <div style="overflow-x:auto">
+          <table class="sheet">
+            <tr><th scope="row">Developer</th><td>Oxygen, with Claude</td></tr>
+            <tr><th scope="row">Platforms</th><td>Browser, on PC and mobile</td></tr>
+            <tr><th scope="row">Price</th><td>Free</td></tr>
+            <tr><th scope="row">Genre</th><td>Arcade shooter, boss rush</td></tr>
+            <tr><th scope="row">Players</th><td>Single player</td></tr>
+            <tr><th scope="row">Languages</th><td>English</td></tr>
+            <tr><th scope="row">Wiki</th><td><a href="wiki/">agamebeforetime.xyz/wiki</a></td></tr>
+            <tr><th scope="row">Where</th><td><a href="https://oxygengames.itch.io/a-game-before-time" target="_blank" rel="noopener">oxygengames.itch.io/a-game-before-time</a></td></tr>
+          </table>
+        </div>
+        <div class="stack">
+          <div class="credits">
+            <div><div class="who" style="color:var(--cyan)">Oxygen</div><div class="role">Developer, music</div></div>
+            <div><div class="who" style="color:var(--orange)">Claude</div><div class="role">Developer</div></div>
+          </div>
+          <p class="kicker" style="line-height:1.6">Screenshots, GIFs and the logo on this page may be used in coverage and videos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>A Game Before Time</span>
+    <span>Developed by Oxygen and Claude</span>
+    <a href="wiki/">Wiki</a>
+  </div>
+</footer>
+
+<script>
+/* PLAY: loads the game (the repo's own index.html) into the frame. It opens on
+   the trailer, which fades into the intro cutscene (js/trailer.js). The click
+   is what lets the frame start with sound. */
+(() => {
+  const box = document.getElementById('player'), btn = document.getElementById('play-btn'), fs = document.getElementById('fs-btn');
+  const GAME = 'game/index.html?site=1&trailer=../media/trailer.mp4';
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.track button[aria-pressed="true"]').forEach(b => b.click());   // stop the soundtrack player
+    const f = document.createElement('iframe');
+    f.src = GAME; f.title = 'A Game Before Time';
+    f.allow = 'autoplay; fullscreen; gamepad; accelerometer; gyroscope';
+    f.allowFullscreen = true;
+    box.replaceChildren(f);
+    f.addEventListener('load', () => { try { f.contentWindow.focus(); } catch (e) { f.focus(); } });
+    fs.hidden = !(document.fullscreenEnabled || document.webkitFullscreenEnabled);   // not on an iPhone
+    fs.onclick = () => (f.requestFullscreen || f.webkitRequestFullscreen || (() => {})).call(f);
+  });
+})();
+</script>
+
+<button type="button" class="sound-toggle" aria-pressed="false">Sound effects: off</button>
+
+<script>
+/* Soundtrack players, plus the game's own menu sounds as optional UI effects
+   (off until the visitor turns them on; nothing plays by itself). */
+(() => {
+  let current = null, currentBtn = null;
+  const play = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L13 8 L4 14 Z"/></svg>';
+  const stop = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10"/></svg>';
+  function setBtn(btn, on) {
+    btn.setAttribute('aria-pressed', on);
+    btn.innerHTML = on ? stop : play;
+    const n = btn.parentElement.querySelector('.name').textContent;
+    btn.setAttribute('aria-label', (on ? 'Stop ' : 'Play ') + n);
+  }
+  function stopCurrent() { if (current) { current.pause(); setBtn(currentBtn, false); current = currentBtn = null; } }
+  document.querySelectorAll('.track button').forEach(btn => btn.addEventListener('click', () => {
+    if (currentBtn === btn) { stopCurrent(); return; }
+    stopCurrent();
+    current = new Audio(btn.dataset.src); current.loop = true; current.volume = 0.7;
+    currentBtn = btn; setBtn(btn, true);
+    current.play().catch(() => stopCurrent());
+  }));
+
+  const sfx = { press: 'media/sounds/ui_press.mp3', start: 'media/sounds/ui_start.mp3', on: 'media/sounds/ui_achievement.mp3' };
+  let fxOn = false;
+  try { fxOn = localStorage.getItem('agbt_site_sfx') === '1'; } catch (e) {}
+  const toggle = document.querySelector('.sound-toggle');
+  const fx = name => { if (!fxOn) return; const a = new Audio(sfx[name]); a.volume = 0.5; a.play().catch(() => {}); };
+  function show() { toggle.setAttribute('aria-pressed', fxOn); toggle.textContent = 'Sound effects: ' + (fxOn ? 'on' : 'off'); }
+  show();
+  toggle.addEventListener('click', () => {
+    fxOn = !fxOn; show();
+    try { localStorage.setItem('agbt_site_sfx', fxOn ? '1' : '0'); } catch (e) {}
+    fx('on');
+  });
+  // the stage-select "start" stinger on the way to the game, the cursor blip on every other link
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (a) fx(a.href.includes('itch.io') ? 'start' : 'press');
+  });
+})();
+</script>
+</body>
+</html>

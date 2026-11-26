@@ -1,0 +1,11 @@
+{
+  "name": "SplashSpark",
+  "width": 16,
+  "height": 16,
+  "layers": [
+    { "type": "rect", "x": 2, "y": 2, "w": 12, "h": 12, "fill": "core", "modes": "8" },
+    { "type": "star", "cx": 8, "cy": 8, "rOuter": 8, "rInner": 3.4, "count": 4, "rotation": 0,
+      "fill": "core", "modes": "16,32,V", "gradientTo": "coreLight", "gradientDir": "radial" },
+    { "type": "ellipse", "cx": 8, "cy": 8, "rx": 3, "ry": 3, "fill": "white", "modes": "32" }
+  ]
+}

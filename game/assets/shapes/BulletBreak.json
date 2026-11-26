@@ -1,0 +1,15 @@
+{
+  "name": "BulletBreak",
+  "width": 6,
+  "height": 8,
+  "layers": [
+    { "type": "rect", "x": 1.2, "y": 0, "w": 4.8, "h": 8, "fill": "hull", "modes": "8,16" },
+    { "type": "rect", "x": 1.2, "y": 0, "w": 4.8, "h": 8, "fill": "hullMid", "modes": "32",
+      "gradientTo": "hull", "gradientDir": "y" },
+    { "type": "rect", "x": 0, "y": 1, "w": 1.2, "h": 6, "fill": "hullDark", "modes": "8,16,32" },
+    { "type": "rect", "x": 1.2, "y": 7, "w": 4.8, "h": 1, "fill": "hullDark", "modes": "16,32" },
+
+    { "type": "polygon", "points": [1,0.5, 5.5,1.5, 4.5,7.5, 0.5,6],
+      "fill": "hull", "modes": "V" }
+  ]
+}

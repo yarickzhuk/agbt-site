@@ -1,0 +1,9 @@
+{
+  "name": "KnightSword",
+  "width": 120,
+  "height": 18,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "ring",
+      "points": [62,5, 95,3, 114,9, 95,15, 62,13] }
+  ]
+}

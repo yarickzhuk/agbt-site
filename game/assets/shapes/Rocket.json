@@ -1,0 +1,17 @@
+{
+  "name": "Rocket",
+  "width": 36,
+  "height": 80,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "grape",
+      "points": [3,18, 19.5,2, 36,19, 19.7,18.3] },
+    { "type": "rect", "x": 6, "y": 19, "w": 28, "h": 31, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 23.1, "y1": 19.4, "x2": 7.3, "y2": 33.4, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 33.3, "y1": 23.4, "x2": 6.8, "y2": 48.9, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 33.6, "y1": 38.2, "x2": 20.8, "y2": 49.4, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 20, "y1": 50, "x2": 15, "y2": 58, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 15, "y1": 58, "x2": 21, "y2": 66, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "capsule", "x1": 21, "y1": 66, "x2": 17.5, "y2": 72, "r": 0.9, "fill": "grape", "modes": "V" },
+    { "type": "ellipse", "cx": 17.5, "cy": 75.4, "rx": 3.5, "ry": 3.3, "fill": "ring", "modes": "V" }
+  ]
+}

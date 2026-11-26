@@ -1,0 +1,12 @@
+{
+  "name": "Wheel",
+  "width": 359,
+  "height": 359,
+  "layers": [
+    { "type": "polygon", "modes": "V", "fill": "grape", "points": [172.69,359.14, 172.69,0.0, 186.55,0.0, 186.55,359.14] },
+    { "type": "polygon", "modes": "V", "fill": "grape", "points": [359.13,187.8, 0.0,185.2, 0.1,171.35, 359.23,173.94] },
+    { "type": "polygon", "modes": "V", "fill": "grape", "points": [305.05,308.26, 44.64,60.93, 54.18,50.88, 314.59,298.21] },
+    { "type": "polygon", "modes": "V", "fill": "grape", "points": [309.21,55.07, 60.01,313.69, 50.03,304.07, 299.23,45.46] },
+    { "type": "ellipse", "modes": "V", "fill": "ring", "cx": 179.6, "cy": 179.6, "rx": 43, "ry": 43 }
+  ]
+}
