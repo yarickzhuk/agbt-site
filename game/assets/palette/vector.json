@@ -1,0 +1,16 @@
+{
+  "name": "vector",
+  "scale": 3.0,
+  "smooth": true,
+  "allowGradients": false,
+  "alphaCutoff": 0.0,
+
+  "stroke": true,
+  "lineWidth": 0.42,
+  "glowRadius": 1.5,
+  "glowStrength": 0.85,
+  "coreWhiteness": 0.30,
+
+  "names":  ["hull",    "hullMid",  "hullLight", "hullDark", "ring",    "ringMid",  "ringLight", "ringDark", "core",    "coreMid",  "coreLight", "coreDark", "heal",    "healMid",  "healLight", "healDark", "amber",   "amberMid", "amberLight", "amberDark", "grape",   "grapeMid", "grapeLight", "grapeDark", "cobalt",  "cobaltMid", "cobaltLight", "cobaltDark", "blood",   "bloodMid", "bloodLight", "bloodDark", "white",   "shadow"],
+  "colors": ["#FFE400", "#FFE400",  "#FFF27A",   "#FFE400",  "#00E6FF", "#00E6FF",  "#7CF0FF",   "#00E6FF",  "#FF00D4", "#FF00D4",  "#FF7FEA",   "#FF00D4",  "#00FF4A", "#00FF4A",  "#7CFFA5",   "#00FF4A",  "#FFA000", "#FFA000",  "#FFC166",    "#FFA000",   "#B300FF", "#B300FF",  "#D680FF",    "#B300FF",   "#2B00FF", "#2B00FF",   "#8C7FFF",     "#2B00FF",    "#FF1A1A", "#FF1A1A",  "#FF7A7A",    "#FF1A1A",   "#FFFFFF", "#0A0A12"]
+}

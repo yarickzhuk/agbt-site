@@ -1,0 +1,63 @@
+{
+  "width": 400,
+  "height": 120,
+  "layers": [
+    {
+      "type": "polygon",
+      "fill": "core",
+      "points": [
+        0,
+        4,
+        400,
+        4,
+        366,
+        64,
+        300,
+        104,
+        100,
+        104,
+        34,
+        64
+      ]
+    },
+    {
+      "type": "polygon",
+      "fill": "ring",
+      "points": [
+        150,
+        104,
+        250,
+        104,
+        224,
+        118,
+        176,
+        118
+      ]
+    },
+    {
+      "type": "rect",
+      "x": 70,
+      "y": 30,
+      "w": 42,
+      "h": 20,
+      "fill": "ring"
+    },
+    {
+      "type": "rect",
+      "x": 288,
+      "y": 30,
+      "w": 42,
+      "h": 20,
+      "fill": "ring"
+    },
+    {
+      "type": "rect",
+      "x": 179,
+      "y": 26,
+      "w": 42,
+      "h": 26,
+      "fill": "coreLight"
+    }
+  ],
+  "name": "Mothership"
+}

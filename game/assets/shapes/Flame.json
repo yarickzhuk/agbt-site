@@ -1,0 +1,8 @@
+{
+  "name": "Flame",
+  "width": 61,
+  "height": 57,
+  "layers": [
+    { "type": "ellipse", "modes": "V", "fill": "grape", "cx": 30.5, "cy": 28.5, "rx": 25.5, "ry": 23.3 }
+  ]
+}

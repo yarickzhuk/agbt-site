@@ -1,0 +1,16 @@
+{
+  "name": "Checkpoint",
+  "width": 610.77,
+  "height": 45.06,
+  "layers": [
+    { "type": "rect", "modes": "V", "fill": "hull", "x": 1.25, "y": 4.22, "w": 180.18, "h": 39.1 },
+    { "type": "rect", "modes": "V", "fill": "hull", "x": 429.34, "y": 4.22, "w": 180.18, "h": 39.1 },
+    { "type": "ellipse", "modes": "V", "fill": "hull", "cx": 239.88, "cy": 23.36, "rx": 10, "ry": 10 },
+    { "type": "ellipse", "modes": "V", "fill": "hull", "cx": 376.88, "cy": 23.36, "rx": 10, "ry": 10 },
+    { "type": "capsule", "modes": "V", "fill": "hull", "x1": 249.88, "y1": 23.36, "x2": 366.88, "y2": 23.36, "r": 2 },
+    { "type": "capsule", "modes": "V", "fill": "hull", "x1": 280, "y1": 23, "x2": 280, "y2": 41, "r": 1.5 },
+    { "type": "capsule", "modes": "V", "fill": "hull", "x1": 303, "y1": 10, "x2": 303, "y2": 41, "r": 1.5 },
+    { "type": "capsule", "modes": "V", "fill": "hull", "x1": 326, "y1": 15, "x2": 326, "y2": 39, "r": 1.5 },
+    { "type": "capsule", "modes": "V", "fill": "hull", "x1": 349, "y1": 8, "x2": 349, "y2": 36, "r": 1.5 }
+  ]
+}

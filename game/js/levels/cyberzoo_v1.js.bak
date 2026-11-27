@@ -1,0 +1,199 @@
+// levels/level1.js — "CYBER ZOO": the original five-phase run.
+//
+//   1. meteors + the bomb                      (timed)
+//   2. laser walls + splash                    (timed)
+//   3. presses + splash + meteors              (timed)
+//   4. warning -> TrapWheel boss               (event)
+//   5. boss dies -> mothership + crystal        (event)
+//
+// Each level is a self-contained module: it composes the shared hazard
+// primitives into its own sequence and exports `run(world, hud)`. Edit this
+// file freely without touching any other level. `run` resolves when the level
+// ends; main.js decides win vs. loss from whether the player is still alive.
+import { input } from '../input.js';
+import { HALF_H, SCREEN_W, SCREEN_H } from '../core.js';
+import { spawnMeteorBatch } from '../meteor.js';
+import { Bomb } from '../bomb.js';
+import { spawnLaser } from '../laser.js';
+import { splashBurst } from '../splash.js';
+import { spawnPress } from '../press.js';
+import { TrapWheel } from '../boss.js';
+import { Mothership } from '../mothership.js';
+import { Crystal } from '../crystal.js';
+import { spawnHealOrb } from '../heal.js';
+
+class Director {
+  constructor(world, hud) { this.world = world; this.hud = hud; }
+
+  async run() {
+    await this.intro();
+    if (this.world.player.dead) return;
+    await this.phase1();
+    if (this.world.player.dead) return;
+    await this.interlude();
+    if (this.world.player.dead) return;
+    await this.phase2();
+    if (this.world.player.dead) return;
+    await this.interlude();
+    if (this.world.player.dead) return;
+    await this.phase3();
+    if (this.world.player.dead) return;
+    await this.interlude();
+    if (this.world.player.dead) return;
+    await this.phase4();
+    if (this.world.player.dead) return;
+    await this.phase5();
+  }
+
+  _anyKeyDown() {
+    return ['left', 'right', 'up', 'down', 'fire', 'lock'].some(k => input.isDown(k));
+  }
+
+  // Level intro: fly the player in from below, flash READY, and hold until the
+  // player presses a key — so the level never starts before they're ready.
+  intro() {
+    return new Promise(resolve => {
+      const w = this.world, p = w.player;
+      p.frozen = true;
+      p.x = 0; p.facing = { x: 0, y: -1 };
+      const startY = HALF_H + 1.5, endY = 2.5, flyDur = 1.2;
+      p.y = startY; p.render();
+      this.hud.setPhaseText('');
+
+      const layer = new PIXI.Container();
+      layer.zIndex = 150;
+      const mk = (s, size, y) => {
+        const t = new PIXI.Text(s, { fontFamily: 'Tektur, monospace', fontSize: size, fill: 0xffffff, letterSpacing: 4, align: 'center' });
+        t.anchor.set(0.5); t.position.set(SCREEN_W / 2, y); t.visible = false; layer.addChild(t); return t;
+      };
+      const ready = mk('READY', 64, SCREEN_H / 2 - 40);
+      const prompt = mk('PRESS ANY KEY', 24, SCREEN_H / 2 + 34);
+      w.stage.addChild(layer);
+
+      let t = 0, armed = false;
+      const step = () => {
+        t += Math.min(w.app.ticker.deltaMS / 1000, 0.05);
+        const k = Math.min(1, t / flyDur);
+        const e = 1 - Math.pow(1 - k, 3);          // ease-out fly-in
+        p.y = startY + (endY - startY) * e; p.render();
+        if (k >= 1) {
+          ready.visible = true; prompt.visible = true;
+          prompt.alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 5));   // blink
+          if (!armed && !this._anyKeyDown()) armed = true;    // require a fresh press
+          if ((armed && this._anyKeyDown()) || p.dead) {
+            w.app.ticker.remove(step);
+            w.stage.removeChild(layer); layer.destroy({ children: true });
+            p.facing = { x: 1, y: 0 }; p.frozen = false;
+            resolve();
+          }
+        }
+      };
+      w.app.ticker.add(step);
+    });
+  }
+
+  // Short breather between phases: clear whatever the last phase left flying,
+  // drop the heal orb into the calm so it can actually be grabbed, then pause a
+  // beat before the next wave. Without this the phases slam into one another and
+  // the run is brutally hard.
+  async interlude(seconds = 1.5) {
+    this.world.clearEntities();
+    spawnHealOrb(this.world);
+    this.hud.setPhaseText('');
+    await this.world.wait(seconds);
+  }
+
+  // --- 1. meteors + the bomb ---
+  async phase1() {
+    this.world.add(new Bomb(this.world, 0, -1));
+    let next = 0;
+    const every = 5, batch = 3;
+    await this.world.runFor(20, (t, left) => {
+      if (t >= next) { spawnMeteorBatch(this.world, batch); next += every; }
+      this.hud.setPhaseText('PHASE 1   ' + Math.ceil(left));
+    });
+  }
+
+  // --- 2. laser walls every 2.5s, alternating sides, + splash ---
+  async phase2() {
+    this.hud.setCenter('');
+    let nextLaser = 0, nextSplash = 6, side = 0;
+    await this.world.runFor(25, (t, left) => {
+      if (t >= nextLaser) {
+        spawnLaser(this.world, (side++ % 2 === 0) ? 'left' : 'right');
+        nextLaser += 2.5;
+      }
+      if (t >= nextSplash) { splashBurst(this.world); nextSplash += 6; }
+      this.hud.setPhaseText('PHASE 2   ' + Math.ceil(left));
+    });
+  }
+
+  // --- 3. presses + splash + meteors ---
+  async phase3() {
+    this.hud.setCenter('');
+    let nextPress = 0, nextSplash = 0, nextMeteor = 1.5;
+    await this.world.runFor(26, (t, left) => {
+      if (t >= nextPress) { spawnPress(this.world); nextPress += 0.85; }
+      if (t >= nextMeteor) { spawnMeteorBatch(this.world, 2); nextMeteor += 6; }
+      if (t >= nextSplash) { splashBurst(this.world); nextSplash += 2.5; }
+      this.hud.setPhaseText('PHASE 3   ' + Math.ceil(left));
+    });
+  }
+
+  // --- 4. warning, then the TrapWheel boss ---
+  async phase4() {
+    this.world.clearEntities();
+    const p = this.world.player;
+    p.x = 0; p.y = 0; p.frozen = true;
+    this.hud.setPhaseText('');
+
+    this.world.audio.play('bossIntro', 0.8);
+    this.world.audio.play('warning', 0.9);
+    for (let i = 0; i < 4 && !p.dead; i++) {
+      this.hud.setCenter('! WARNING !');
+      await this.world.wait(0.5);
+      this.hud.setCenter('');
+      await this.world.wait(0.5);
+    }
+    p.frozen = false;
+    if (p.dead) return;
+
+    const boss = new TrapWheel(this.world);
+    this.world.add(boss);
+    let defeated = false;
+    boss.onDefeated = () => { defeated = true; };
+    await this.world.waitUntil(() => defeated || this.world.player.dead);
+  }
+
+  // --- 5. boss down -> mothership descends + crystal ---
+  async phase5() {
+    this.hud.setPhaseText('');
+    this.world.clearEntities();               // clear any stragglers after the boss
+    await this.world.wait(2.5);               // a clear beat before the crystal appears
+    if (this.world.player.dead) return;
+
+    const ship = new Mothership(this.world);
+    this.world.add(ship);
+    const crystal = new Crystal(this.world);
+    this.world.add(crystal);
+
+    this.hud.setCenter('SHOOT THE CRYSTAL');
+    this.world.wait(2).then(() => {
+      if (this.hud.center.text === 'SHOOT THE CRYSTAL') this.hud.setCenter('');
+    });
+
+    let collected = false;
+    ship.onEscape = () => {};
+    crystal.onCollected = () => { ship.crystalCollected(); this.hud.setCenter(''); collected = true; };
+
+    await this.world.waitUntil(() => collected || this.world.player.dead);
+    if (this.world.player.dead) return;
+
+    // Let the extract theme (~3.8s) and the fly-away play out before main.js
+    // shows the Stage Clear screen — otherwise victory lands mid-theme.
+    await this.world.wait(3.5);
+    // level clear is handled by main.js (marks progress + shows the screen)
+  }
+}
+
+export async function run(world, hud) { return new Director(world, hud).run(); }

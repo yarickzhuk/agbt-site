@@ -1,0 +1,13 @@
+{
+  "name": "PlayerNormal",
+  "width": 37,
+  "height": 30,
+  "layers": [
+    { "type": "polygon", "points": [1,1, 36,15, 1,29], "fill": "hull", "modes": "8,16" },
+    { "type": "polygon", "points": [1,1, 36,15, 1,29], "fill": "hull", "modes": "32",
+      "gradientTo": "hullMid", "gradientDir": "x" },
+    { "type": "polygon", "points": [7,7, 23,15, 7,23], "fill": "hull", "erase": true, "modes": "8,16,32" },
+    { "type": "polygon", "points": [1,25, 30,17, 1,29], "fill": "hullDark", "clip": true, "modes": "16,32" },
+    { "type": "polygon", "points": [1,1, 26,11, 1,4], "fill": "hullLight", "clip": true, "modes": "32" }
+  ]
+}

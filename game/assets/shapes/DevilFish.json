@@ -1,0 +1,9 @@
+{
+  "name": "DevilFish",
+  "width": 96,
+  "height": 80,
+  "layers": [
+    { "type": "polygon", "fill": "ring", "points": [40, 6, 90, 40, 40, 74, 54, 40] },
+    { "type": "polygon", "fill": "ring", "points": [40, 40, 28, 32, 18, 48, 6, 40] }
+  ]
+}

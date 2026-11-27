@@ -1,0 +1,20 @@
+{
+  "name": "Bullet",
+  "width": 15,
+  "height": 9,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0.5, "w": 7, "h": 8, "fill": "hull", "modes": "8,16" },
+    { "type": "ellipse", "cx": 8, "cy": 4.5, "rx": 5, "ry": 4, "fill": "hull", "modes": "8,16" },
+
+    { "type": "rect", "x": 0, "y": 0.5, "w": 7, "h": 8, "fill": "hullMid", "modes": "32",
+      "gradientTo": "hull", "gradientDir": "y" },
+    { "type": "ellipse", "cx": 8, "cy": 4.5, "rx": 5, "ry": 4, "fill": "hullMid", "modes": "32",
+      "gradientTo": "hull", "gradientDir": "y" },
+
+    { "type": "ellipse", "cx": 6, "cy": 8.6, "rx": 8, "ry": 2.4, "fill": "hullDark", "clip": true, "modes": "16,32" },
+    { "type": "ellipse", "cx": 7, "cy": 2, "rx": 3.5, "ry": 1.2, "fill": "hullLight", "clip": true, "modes": "32" },
+
+    { "type": "polygon", "points": [0,0.5, 8,0.5, 11,2, 13,4.5, 11,7, 8,8.5, 0,8.5],
+      "fill": "hull", "modes": "V" }
+  ]
+}
