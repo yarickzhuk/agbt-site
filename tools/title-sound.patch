@@ -1,0 +1,29 @@
+diff --git a/index.html b/index.html
+index fc62192..d0f6baf 100644
+--- a/index.html
++++ b/index.html
+@@ -419,10 +419,24 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content:
+   const fx = name => { if (!fxOn) return; const a = new Audio(sfx[name]); a.volume = 0.5; a.play().catch(() => {}); };
+   function show() { toggle.setAttribute('aria-pressed', fxOn); toggle.textContent = 'Sound effects: ' + (fxOn ? 'on' : 'off'); }
+   show();
++  // The title logo video carries its own sound (the same logo reveal as the end
++  // of the trailer). Browsers only let a video start with sound after a click,
++  // so it autoplays muted; turning Sound effects on, or clicking the logo,
++  // unmutes it and plays it again from the start (turning them off mutes it).
++  const hero = document.querySelector('.hero video');
++  function heroPlay() {
++    if (!hero) return;
++    hero.muted = false;
++    try { hero.currentTime = 0; } catch (e) {}
++    const p = hero.play();
++    if (p && p.catch) p.catch(() => { hero.muted = true; hero.play().catch(() => {}); });
++  }
++  if (hero) { hero.style.cursor = 'pointer'; hero.addEventListener('click', heroPlay); }
+   toggle.addEventListener('click', () => {
+     fxOn = !fxOn; show();
+     try { localStorage.setItem('agbt_site_sfx', fxOn ? '1' : '0'); } catch (e) {}
+     fx('on');
++    if (hero) { if (fxOn) heroPlay(); else hero.muted = true; }
+   });
+   // the stage-select "start" stinger on the way to the game, the cursor blip on every other link
+   document.addEventListener('click', e => {
